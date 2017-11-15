@@ -8,6 +8,8 @@
 #include <QPixmap>
 #include <cassert>
 #include <cstdlib>
+#include <QFile>
+#include <QTextStream>
 #include "hero.h"
 #include "decoration.h"
 
@@ -20,6 +22,8 @@ public:
     void set_hero_coords(const int, const int);
     void set_hero(Hero *);
     void set_size(const int, const int);
+    void set_background(QPixmap);
+    void read_decorations(QString);
 
 signals:
     // Signal for throwing cursor position
@@ -38,6 +42,7 @@ private:
     Hero *phero;                                                            //Hero pointer (main scene object so req.)
     int WIDTH;
     int HEIGHT;
+    QPixmap bg_image;
 };
 
 #endif // CUSTOMSCENE_H

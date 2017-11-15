@@ -81,7 +81,6 @@ void Hero::slotTarget(QPointF point)
 void Hero::slotGameTimer()
 {
     // Перемещаем треугольник в зависимости от нажатых кнопок
-    bool fl = !scene()->collidingItems(this).isEmpty();
     if(GetAsyncKeyState('A')) {
         this->setX(this->x() - 1);
         //Collision checking x4

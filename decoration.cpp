@@ -3,7 +3,13 @@
 Decoration::Decoration(QRect r)
     : QGraphicsItem()
 {
-    rect = r;
+    form.addRect(r);
+}
+
+Decoration::Decoration(QPainterPath path)
+    : QGraphicsItem()
+{
+    form = path;
 }
 
 Decoration::~Decoration()
@@ -14,24 +20,22 @@ Decoration::~Decoration()
 void Decoration::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setBrush(QBrush(Qt::darkGray));
-    painter->drawRect(rect);
+    painter->drawPath(form);
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
 
 QPainterPath Decoration::shape() const
 {
-    QPainterPath path;
-    path.addRect(rect);
-    return path;
+    return form;
 }
 
 QRectF Decoration::boundingRect() const
 {
-    return rect;
+    return form.boundingRect();
 }
 
-QRect Decoration::Rect() const
+QPainterPath Decoration::Path() const
 {
-    return rect;
+    return form;
 }

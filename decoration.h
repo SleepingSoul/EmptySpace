@@ -8,13 +8,15 @@ class Decoration : public QGraphicsItem
 {
 public:
     explicit Decoration(QRect = QRect(0, 0, 50, 50));
+    Decoration(QPainterPath);
     ~Decoration();
-    QRect Rect() const;
+    void set_path(QPainterPath);
+    QPainterPath Path() const;
 private:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     QPainterPath shape() const override;
     QRectF boundingRect() const override;
-    QRect rect;
+    QPainterPath form;
 };
 
 #endif // DECORATION_H

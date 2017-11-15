@@ -39,8 +39,6 @@ private slots:
 private:
     QTimer *gameTimer;                                                              //Main game timer
     QPointF target;                                                                 //Cursor position
-    QPoint prev_pos;                                                                /*Previous position of hero
-                                                                                      (for collisions fixing)*/
 };
 
 #endif // HERO_H
