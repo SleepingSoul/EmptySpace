@@ -23,13 +23,14 @@ GameWindow::GameWindow(QWidget *parent) :
 
     phero = new Hero;
     phero->setPos(500, 500);
-    pgraphics_scene->set_hero_coords(500, 500);
     pgraphics_scene->addItem(phero);
 
     pgraphics_scene->set_hero(phero);
 
     connect(pgraphics_scene, SIGNAL(signalTargetCoordinate(QPointF)), phero, SLOT(slotTarget(QPointF)));
     connect(phero, SIGNAL(moveBackground(dir)), pgraphics_scene, SLOT(slotMoveBackground(dir)));
+
+    connect(phero, SIGNAL(changeOffsetFlag(bool)), pgraphics_scene, SLOT(slotChangeOffsetChangedFlag(bool)));
 }
 
 GameWindow::~GameWindow()

@@ -7,7 +7,6 @@
 #include <QDebug>
 #include <QPixmap>
 #include <cassert>
-#include <cstdlib>
 #include <QFile>
 #include <QTextStream>
 #include "hero.h"
@@ -19,11 +18,11 @@ class CustomScene : public QGraphicsScene
 public:
     explicit CustomScene(QObject *parent = 0);
     ~CustomScene();
-    void set_hero_coords(const int, const int);
     void set_hero(Hero *);
     void set_size(const int, const int);
-    void set_background(QPixmap);
-    void read_decorations(QString);
+    void set_background(const QPixmap);
+    void read_decorations(const QString);
+    void set_offset_change_flag(const bool);
 
 signals:
     // Signal for throwing cursor position
@@ -31,6 +30,7 @@ signals:
 
 public slots:
     void slotMoveBackground(dir);                                           //Slot for moving the background
+    void slotChangeOffsetChangedFlag(bool);
 private:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;               //Mouse tracking
     void keyPressEvent(QKeyEvent *) override;                               //Key tracking
@@ -43,6 +43,7 @@ private:
     int WIDTH;
     int HEIGHT;
     QPixmap bg_image;
+    bool offsets_changed;
 };
 
 #endif // CUSTOMSCENE_H

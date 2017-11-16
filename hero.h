@@ -25,6 +25,7 @@ public:
 signals:
     void moveBackground(dir);                                                       /*Signal to move the background
                                                                                     depending on hero movings*/
+    void changeOffsetFlag(bool);
 public slots:
     void slotTarget(QPointF point);                                                 /*Slot receiving the position
                                                                                     of cursor*/

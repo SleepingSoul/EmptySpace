@@ -36,7 +36,7 @@ Hero::~Hero()
 QRectF Hero::boundingRect() const
 {
     //bounding rect of hero
-    return QRectF(-10, -10, 20, 20);
+    return QRectF(-15, -15, 30, 30);
 }
 
 QPainterPath Hero::shape() const
@@ -106,6 +106,8 @@ void Hero::slotGameTimer()
             this->setY(this->y() - 1);
         }
     }
+
+    emit changeOffsetFlag(false);            //заранее говорим, что оффсеты не меняются
 
     if(this->x() - 200 < 0) {
         emit moveBackground(LEFT);

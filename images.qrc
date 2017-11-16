@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>bg_image.png</file>
         <file>bg_image_1.png</file>
-        <file>decor.txt</file>
         <file>bg_image_2.png</file>
+        <file>sprite_sheet.png</file>
     </qresource>
 </RCC>

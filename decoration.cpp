@@ -1,15 +1,11 @@
 #include "decoration.h"
 
-Decoration::Decoration(QRect r)
+Decoration::Decoration(QPolygon poly)
     : QGraphicsItem()
 {
-    form.addRect(r);
-}
-
-Decoration::Decoration(QPainterPath path)
-    : QGraphicsItem()
-{
-    form = path;
+    form = poly;
+    _shape_path.addPolygon(poly);
+    _bounding_rect = form.boundingRect();
 }
 
 Decoration::~Decoration()
@@ -20,22 +16,22 @@ Decoration::~Decoration()
 void Decoration::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setBrush(QBrush(Qt::darkGray));
-    painter->drawPath(form);
+    painter->drawPolygon(form);
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
 
 QPainterPath Decoration::shape() const
 {
-    return form;
+    return _shape_path;
 }
 
 QRectF Decoration::boundingRect() const
 {
-    return form.boundingRect();
+    return _bounding_rect;
 }
 
-QPainterPath Decoration::Path() const
+QPolygon Decoration::Polygon() const
 {
     return form;
 }
