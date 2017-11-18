@@ -35,3 +35,13 @@ QPolygon Decoration::Polygon() const
 {
     return form;
 }
+
+void Decoration::set_def_pos(const QPoint p)
+{
+    _default_pos = p;
+}
+
+QPoint Decoration::def_pos() const
+{
+    return _default_pos;
+}

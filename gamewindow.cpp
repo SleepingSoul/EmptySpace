@@ -9,8 +9,8 @@ GameWindow::GameWindow(QWidget *parent) :
     this->resize(1000, 600);
     this->setFixedSize(1000, 600);
 
-    pgraphics_scene = new CustomScene;             //custom graphics scene
-    pgraphics_view = new QGraphicsView(this);      //graphics view
+    pgraphics_view = new QGraphicsView(this);                                 //graphics view
+    pgraphics_scene = new CustomScene(1000, 600);                             //custom graphics scene
 
     pgraphics_view->setRenderHint(QPainter::Antialiasing);
     pgraphics_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -18,7 +18,6 @@ GameWindow::GameWindow(QWidget *parent) :
 
     pgraphics_view->setScene(pgraphics_scene);
     pgraphics_view->setSceneRect(0, 0, 1000, 600);
-    pgraphics_scene->set_size(1000, 600);               //setting up the main sizes of scene
     pgraphics_view->setMouseTracking(true);
 
     phero = new Hero;
@@ -26,9 +25,6 @@ GameWindow::GameWindow(QWidget *parent) :
     pgraphics_scene->addItem(phero);
 
     pgraphics_scene->set_hero(phero);
-
-    connect(pgraphics_scene, SIGNAL(signalTargetCoordinate(QPointF)), phero, SLOT(slotTarget(QPointF)));
-    connect(phero, SIGNAL(moveBackground(dir)), pgraphics_scene, SLOT(slotMoveBackground(dir)));
 
     connect(phero, SIGNAL(changeOffsetFlag(bool)), pgraphics_scene, SLOT(slotChangeOffsetChangedFlag(bool)));
 }

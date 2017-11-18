@@ -9,6 +9,8 @@
 #include <cassert>
 #include <QFile>
 #include <QTextStream>
+#include <QKeyEvent>
+#include <QtMath>
 #include "hero.h"
 #include "decoration.h"
 
@@ -16,34 +18,43 @@ class CustomScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit CustomScene(QObject *parent = 0);
+    explicit CustomScene(const int w, const int h, QObject *parent = 0);
     ~CustomScene();
-    void set_hero(Hero *);
-    void set_size(const int, const int);
-    void set_background(const QPixmap);
-    void read_decorations(const QString);
+
+    void set_hero              (Hero *);                    //set hero pointer to have oportuniy to move it
+    void set_background        (const QPixmap);             //set background picture
+    void read_decorations      (const QString);             //read decoration polygons from file
     void set_offset_change_flag(const bool);
 
-signals:
-    // Signal for throwing cursor position
-    void signalTargetCoordinate(QPointF point);
-
 public slots:
-    void slotMoveBackground(dir);                                           //Slot for moving the background
     void slotChangeOffsetChangedFlag(bool);
-private:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *) override;               //Mouse tracking
-    void keyPressEvent(QKeyEvent *) override;                               //Key tracking
-    void drawBackground(QPainter *, const QRectF &) override;
-    int hor_offset;
-    int ver_offset;
-    QVector <Decoration *> dec_vec;
-    QVector <Decoration *> temp_decs;
-    Hero *phero;                                                            //Hero pointer (main scene object so req.)
-    int WIDTH;
-    int HEIGHT;
+
+private slots:
+    void slotFPStimer();                                    //slot which controls program FPS.
+
+private /*functions*/:
+    void mouseMoveEvent  (QGraphicsSceneMouseEvent *) override;      //Mouse tracking
+    void keyPressEvent   (QKeyEvent *)                override;      //Key tracking
+    void keyReleaseEvent (QKeyEvent *)                override;      //Key release control
+    void drawBackground  (QPainter *, const QRectF &) override;      //function that draws BG
+    void targetCoordinate(QPointF);                                  //To set hero angle straight to cursor
+    void moveBackground  (const dir);
+
+private /*objects*/:
+    QVector <Decoration *> dec_vec;     //vector which contains all Decorations
+    QSet <Qt::Key> pr_keys;             //set which contains all legal pressed and not released keys
+    int hor_offset;                     //horizintal offset of the scene
+    int ver_offset;                     //vertical offset of the scene
+    const int WIDTH;
+    const int HEIGHT;
+    const int STEP;
     QPixmap bg_image;
     bool offsets_changed;
+    QTimer *fps_timer;
+    QPointF target;
+    double robot_angle;
+
+    Hero *phero;
 };
 
 #endif // CUSTOMSCENE_H
