@@ -5,6 +5,7 @@
 #include <QWidget>
 #include "customscene.h"
 #include "hero.h"
+#include "herothrust.h"
 
 class GameWindow : public QWidget
 {
@@ -17,6 +18,7 @@ private:
     CustomScene *pgraphics_scene;      //QGraphicsScene
     QGraphicsView *pgraphics_view;     //QGraphicsView
     Hero *phero;                        //Hero pointer
+    HeroThrust *phthrust;
 };
 
 #endif // GAMEWINDOW_H

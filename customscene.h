@@ -11,8 +11,10 @@
 #include <QTextStream>
 #include <QKeyEvent>
 #include <QtMath>
-#include "hero.h"
+#include <QTimer>
 #include "decoration.h"
+#include "hero.h"
+#include "herothrust.h"
 
 class CustomScene : public QGraphicsScene
 {
@@ -22,13 +24,14 @@ public:
     ~CustomScene();
 
     void set_hero              (Hero *);                    //set hero pointer to have oportuniy to move it
+    void set_hero_thrust       (HeroThrust *);              //set hero thrust to have oportunity to rotate it
     void set_background        (const QPixmap);             //set background picture
     void read_decorations      (const QString);             //read decoration polygons from file
     void set_offset_change_flag(const bool);
 
 signals:
-    void setHeroMovingState(bool);
-    void setHeroDirecion(dir);
+    void transfer_HeroMovingState_to_HeroThrust(bool);
+    void transfer_HeroDirecion_to_HeroThrust   (dir);
 
 public slots:
     void slotChangeOffsetChangedFlag(bool);
@@ -43,6 +46,8 @@ private /*functions*/:
     void drawBackground  (QPainter *, const QRectF &) override;      //function that draws BG
     void targetCoordinate(QPointF);                                  //To set hero angle straight to cursor
     void moveBackground  (const dir);
+    void move_hero_x     (const int);                                //moves hero and thrust
+    void move_hero_y     (const int);
 
 private /*objects*/:
     QVector <Decoration *> dec_vec;     //vector which contains all Decorations
@@ -59,6 +64,7 @@ private /*objects*/:
     double robot_angle;
 
     Hero *phero;
+    HeroThrust *phthrust;
 };
 
 #endif // CUSTOMSCENE_H

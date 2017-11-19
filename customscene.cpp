@@ -18,6 +18,7 @@ CustomScene::CustomScene(const int w, const int h, QObject *parent)
       hor_offset(0),
       ver_offset(0),
       phero(nullptr),
+      phthrust(nullptr),
       STEP(3),
       WIDTH(w),
       HEIGHT(h),
@@ -138,65 +139,71 @@ void CustomScene::slotChangeOffsetChangedFlag(bool f)
 void CustomScene::slotFPStimer()
 {
     dir result_dir = NO_DIR;
-    if(pr_keys.contains(Qt::Key_W)) {
-        phero->setY(phero->y() - STEP);
-        if(!this->collidingItems(phero).isEmpty())
-            phero->setY(phero->y() + STEP);
-        emit setHeroMovingState(true);
+
+    if (pr_keys.contains(Qt::Key_W)) {
+        move_hero_y(phero->y() - STEP);
+        if (this->collidingItems(phero).size() != 1)
+            move_hero_y(phero->y() + STEP);
+
+        emit transfer_HeroMovingState_to_HeroThrust(true);
+
         result_dir = N;
     }
 
-    if(pr_keys.contains(Qt::Key_A)) {
-        phero->setX(phero->x() - STEP);
-        if(!this->collidingItems(phero).isEmpty())
-            phero->setX(phero->x() + STEP);
-        emit setHeroMovingState(true);
-        if (result_dir == N)
-            result_dir = NW;
-        else
-            result_dir = W;
+    if (pr_keys.contains(Qt::Key_A)) {
+        move_hero_x(phero->x() - STEP);
+        if (this->collidingItems(phero).size() != 1)
+            move_hero_x(phero->x() + STEP);
+
+        emit transfer_HeroMovingState_to_HeroThrust(true);
+
+        if (result_dir == N) result_dir = NW;
+        else                 result_dir = W;
     }
 
-    if(pr_keys.contains(Qt::Key_S)) {
-        phero->setY(phero->y() + STEP);
-        if(!this->collidingItems(phero).isEmpty())
-            phero->setY(phero->y() - STEP);
-        emit setHeroMovingState(true);
-        if (result_dir == W)
-            result_dir = SW;
-        else
-            result_dir = S;
+    if (pr_keys.contains(Qt::Key_S)) {
+        move_hero_y(phero->y() + STEP);
+        if (this->collidingItems(phero).size() != 1)
+            move_hero_y(phero->y() - STEP);
+
+        emit transfer_HeroMovingState_to_HeroThrust(true);
+
+        if (result_dir == W) result_dir = SW;
+        else                 result_dir = S;
     }
 
-    if(pr_keys.contains(Qt::Key_D)) {
-        phero->setX(phero->x() + STEP);
-        if(!this->collidingItems(phero).isEmpty())
-            phero->setX(phero->x() - STEP);
-        emit setHeroMovingState(true);
-        if (result_dir == N)
-            result_dir = NE;
-        else if (result_dir == S)
-            result_dir = SE;
-        else
-            result_dir = E;
-    }
-    emit setHeroDirecion(result_dir);
+    if (pr_keys.contains(Qt::Key_D)) {
+        move_hero_x(phero->x() + STEP);
+        if (this->collidingItems(phero).size() != 1)
+            move_hero_x(phero->x() - STEP);
 
-    if(phero->x() - 200 < 0) {
+        emit transfer_HeroMovingState_to_HeroThrust(true);
+
+        if      (result_dir == N) result_dir = NE;
+        else if (result_dir == S) result_dir = SE;
+        else                      result_dir = E;
+    }
+
+    if (!pr_keys.isEmpty())                                         //we check out set to be not empty
+        emit transfer_HeroDirecion_to_HeroThrust(result_dir);       /*because if no buttons are pressed,
+                                                                      we should use previous direction
+                                                                      for painting faiding of thrusts*/
+
+    if (phero->x() - 200 < 0) {
         moveBackground(W);
-        phero->setX(200);
+        move_hero_x(200);
     }
-    if(phero->x() + 200 > 1000) {
+    if (phero->x() + 200 > 1000) {
         moveBackground(E);
-        phero->setX(800);
+        move_hero_x(800);
     }
-    if(phero->y() - 200 < 0) {
+    if (phero->y() - 200 < 0) {
         moveBackground(N);
-        phero->setY(200);
+        move_hero_y(200);
     }
     if(phero->y() + 200 > 600) {
         moveBackground(S);
-        phero->setY(400);
+        move_hero_y(400);
     }
     QLineF lineToTarget(phero->pos(), target);
     qreal angleToTarget = ::acos(lineToTarget.dx() / lineToTarget.length());
@@ -234,4 +241,21 @@ void CustomScene::moveBackground(const dir d)
         assert(false);
     }
     offsets_changed = true;
+}
+
+void CustomScene::set_hero_thrust(HeroThrust *ht)
+{
+    phthrust = ht;
+}
+
+void CustomScene::move_hero_x(const int x)
+{
+    phero->setX(x);
+    phthrust->setX(x);
+}
+
+void CustomScene::move_hero_y(const int y)
+{
+    phero->setY(y);
+    phthrust->setY(y);
 }

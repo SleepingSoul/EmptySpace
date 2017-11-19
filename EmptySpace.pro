@@ -27,14 +27,17 @@ SOURCES += main.cpp\
     myapplication.cpp \
     gamewindow.cpp \
     hero.cpp \
-    decoration.cpp
+    decoration.cpp \
+    herothrust.cpp
 
 HEADERS  += \
     customscene.h \
     myapplication.h \
     gamewindow.h \
     hero.h \
-    decoration.h
+    decoration.h \
+    herothrust.h \
+    direction.h
 
 FORMS    += widget.ui
 
