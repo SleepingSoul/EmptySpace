@@ -16,27 +16,24 @@ static qreal normalizeAngle(qreal angle)
 
 Hero::Hero(QObject *parent) :
     QObject(parent),
-    QGraphicsItem()
+    QGraphicsItem(),
+    is_moving(false),
+    _thrust_offset(0)
 {
-    setRotation(0);                     //first rotation of the hero always 0
-
-    target = QPointF(0, 0);             //first direction of hero - NW
-
-    //Set up timer
-    gameTimer = new QTimer();
-    connect(gameTimer, SIGNAL(timeout()), SLOT(slotGameTimer()));
-    gameTimer->start(5);   // Стартуем таймеp
+    hero_pic = new QPixmap("spaceship_pic150x150.png");
+    sprite_thrust = new QPixmap("thrust_sprite_blue.png");
 }
 
 Hero::~Hero()
 {
-
+    delete hero_pic;
+    delete sprite_thrust;
 }
 
 QRectF Hero::boundingRect() const
 {
     //bounding rect of hero
-    return QRectF(-15, -15, 30, 30);
+    return QRectF(-50, -50, 100, 100);
 }
 
 QPainterPath Hero::shape() const
@@ -50,38 +47,51 @@ QPainterPath Hero::shape() const
 void Hero::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     //Paint hero (triangle in this case)
-    QPolygon polygon;
-    polygon << QPoint(0,-15) << QPoint(12,15) << QPoint(-12,15);
-    painter->setBrush(Qt::red);
-    painter->drawPolygon(polygon);
+    if (is_moving) {
+        QPixmap thrust_pic;
+        QRect cut_rect;
+
+        if (_thrust_offset / 30 > 9)
+            cut_rect.setRect(270, 0, 30, 70);
+        else {
+            cut_rect.setRect(_thrust_offset, 0, 30, 70);
+            _thrust_offset += 30;
+        }
+
+        thrust_pic = sprite_thrust->copy(cut_rect);
+
+        QRect thrust_rect1(-30, 0, 30, 70);
+
+        painter->drawPixmap(-17, 15, 30, 70, thrust_pic);
+        is_moving = false;
+    }
+    else {
+        QPixmap thrust_pic;
+        QRect cut_rect;
+        if (_thrust_offset / 30 >= 0) {
+            cut_rect.setRect(_thrust_offset, 0, 30, 70);
+            _thrust_offset -= 30;
+            thrust_pic = sprite_thrust->copy(cut_rect);
+            painter->drawPixmap(-17, 30, 30, 70, thrust_pic);
+        }
+        else {
+            cut_rect.setRect(0, 0, 30, 70);
+            thrust_pic = sprite_thrust->copy(cut_rect);
+            painter->drawPixmap(-17, 30, 30, 70, thrust_pic);
+        }
+    }
+    painter->drawPixmap(-75, -75, 150, 150, *hero_pic);
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
 
-void Hero::slotTarget(QPointF point)
+void Hero::slotSetMovingState(bool state_flag)
 {
-    //Find distance to target
-//    target = point;
-//    QLineF lineToTarget(QPointF(0, 0), mapFromScene(target));
-//    qreal angleToTarget = ::acos(lineToTarget.dx() / lineToTarget.length());
-//    if (lineToTarget.dy() < 0)
-//        angleToTarget = TwoPi - angleToTarget;
-//    angleToTarget = normalizeAngle((Pi - angleToTarget) + Pi / 2);
-
-//    if (angleToTarget >= 0 && angleToTarget < Pi) {
-//        // Rotate left
-//        setRotation(rotation() - angleToTarget * 180 /Pi);
-//    }
-//    else if (angleToTarget <= TwoPi && angleToTarget > Pi) {
-//        // Rotate right
-//        setRotation(rotation() + (angleToTarget - TwoPi )* (-180) /Pi);
-//    }
+    is_moving = state_flag;
 }
 
-void Hero::slotGameTimer()
+void Hero::slotSetDirection(dir d)
 {
-    emit changeOffsetFlag(false);            //заранее говорим, что оффсеты не меняются
-
-    slotTarget(target);                                     //update the rotation
+    direction = d;
 }

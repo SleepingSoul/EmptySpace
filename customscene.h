@@ -26,6 +26,10 @@ public:
     void read_decorations      (const QString);             //read decoration polygons from file
     void set_offset_change_flag(const bool);
 
+signals:
+    void setHeroMovingState(bool);
+    void setHeroDirecion(dir);
+
 public slots:
     void slotChangeOffsetChangedFlag(bool);
 

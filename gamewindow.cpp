@@ -26,7 +26,8 @@ GameWindow::GameWindow(QWidget *parent) :
 
     pgraphics_scene->set_hero(phero);
 
-    connect(phero, SIGNAL(changeOffsetFlag(bool)), pgraphics_scene, SLOT(slotChangeOffsetChangedFlag(bool)));
+    connect(pgraphics_scene, SIGNAL(setHeroMovingState(bool)), phero, SLOT(slotSetMovingState(bool)));
+    connect(pgraphics_scene, SIGNAL(setHeroDirecion(dir)), phero, SLOT(slotSetDirection(dir)));
 }
 
 GameWindow::~GameWindow()

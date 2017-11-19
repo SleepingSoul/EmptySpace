@@ -18,7 +18,7 @@ CustomScene::CustomScene(const int w, const int h, QObject *parent)
       hor_offset(0),
       ver_offset(0),
       phero(nullptr),
-      STEP(4),
+      STEP(3),
       WIDTH(w),
       HEIGHT(h),
       robot_angle(0)
@@ -30,11 +30,11 @@ CustomScene::CustomScene(const int w, const int h, QObject *parent)
         dec->set_def_pos(dec->pos().toPoint());
     }
 
-    bg_image.load(":/bg_image_2.png");
+    bg_image.load("galaxy_map10kx10k.jpg");
 
     fps_timer = new QTimer(this);
     connect(fps_timer, SIGNAL(timeout()), SLOT(slotFPStimer()));
-    fps_timer->start(23);
+    fps_timer->start(18);
     Q_UNUSED(parent);
 }
 
@@ -61,6 +61,7 @@ void CustomScene::drawBackground(QPainter *painter, const QRectF &rect)
         foreach (Decoration *dec, dec_vec)                              /*we are moving all decorations depending
                                                                           on offsets*/
             dec->setPos(-1 * dec->def_pos().x() - hor_offset, -1 * dec->def_pos().y() - ver_offset);
+        offsets_changed = false;
     }
     else
         painter->drawPixmap(0, 0, WIDTH, HEIGHT, cropped);
@@ -83,7 +84,7 @@ void CustomScene::keyPressEvent(QKeyEvent *event)
 
 void CustomScene::keyReleaseEvent(QKeyEvent *event)
 {
-    pr_keys.remove(Qt::Key(event->key())    );
+    pr_keys.remove(Qt::Key(event->key()));
 }
 
 void CustomScene::set_hero(Hero *h)
@@ -136,44 +137,65 @@ void CustomScene::slotChangeOffsetChangedFlag(bool f)
 
 void CustomScene::slotFPStimer()
 {
+    dir result_dir = NO_DIR;
     if(pr_keys.contains(Qt::Key_W)) {
         phero->setY(phero->y() - STEP);
         if(!this->collidingItems(phero).isEmpty())
             phero->setY(phero->y() + STEP);
+        emit setHeroMovingState(true);
+        result_dir = N;
     }
 
     if(pr_keys.contains(Qt::Key_A)) {
         phero->setX(phero->x() - STEP);
         if(!this->collidingItems(phero).isEmpty())
             phero->setX(phero->x() + STEP);
+        emit setHeroMovingState(true);
+        if (result_dir == N)
+            result_dir = NW;
+        else
+            result_dir = W;
     }
 
     if(pr_keys.contains(Qt::Key_S)) {
         phero->setY(phero->y() + STEP);
         if(!this->collidingItems(phero).isEmpty())
             phero->setY(phero->y() - STEP);
+        emit setHeroMovingState(true);
+        if (result_dir == W)
+            result_dir = SW;
+        else
+            result_dir = S;
     }
 
     if(pr_keys.contains(Qt::Key_D)) {
         phero->setX(phero->x() + STEP);
         if(!this->collidingItems(phero).isEmpty())
             phero->setX(phero->x() - STEP);
+        emit setHeroMovingState(true);
+        if (result_dir == N)
+            result_dir = NE;
+        else if (result_dir == S)
+            result_dir = SE;
+        else
+            result_dir = E;
     }
+    emit setHeroDirecion(result_dir);
 
     if(phero->x() - 200 < 0) {
-        moveBackground(LEFT);
+        moveBackground(W);
         phero->setX(200);
     }
     if(phero->x() + 200 > 1000) {
-        moveBackground(RIGHT);
+        moveBackground(E);
         phero->setX(800);
     }
     if(phero->y() - 200 < 0) {
-        moveBackground(TOP);
+        moveBackground(N);
         phero->setY(200);
     }
     if(phero->y() + 200 > 600) {
-        moveBackground(BOT);
+        moveBackground(S);
         phero->setY(400);
     }
     QLineF lineToTarget(phero->pos(), target);
@@ -195,17 +217,17 @@ void CustomScene::targetCoordinate(QPointF point)
 
 void CustomScene::moveBackground(const dir d)
 {
-    switch(d) {
-    case LEFT:
+    switch (d) {
+    case W:
         hor_offset -= STEP;
         break;
-    case RIGHT:
+    case E:
         hor_offset += STEP;
         break;
-    case TOP:
+    case N:
         ver_offset -= STEP;
         break;
-    case BOT:
+    case S:
         ver_offset += STEP;
         break;
     default:

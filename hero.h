@@ -11,9 +11,12 @@
 
 #include <windows.h>
 
-//direction
-enum dir{TOP = 0, RIGHT, BOT, LEFT};                                                /*Enumeration for
-                                                                                    directing the Hero's movings*/
+/*direction:
+ * NORTH, SOUTH, WEST, EAST,
+ * NORTHWEST, NORTHEAST,
+ * SOUTHWEST, SOUTHEAST,
+ * NO_DIR = direction is undefined*/
+enum dir{N = 0, S, W, E, NW, NE, SW, SE, NO_DIR};
 
 class Hero : public QObject, public QGraphicsItem
 {
@@ -22,24 +25,20 @@ public:
     explicit Hero(QObject *parent = 0);
     ~Hero();
 
-signals:
-    void moveBackground(dir);                                                       /*Signal to move the background
-                                                                                    depending on hero movings*/
-    void changeOffsetFlag(bool);
 public slots:
-    void slotTarget(QPointF point);                                                 /*Slot receiving the position
-                                                                                    of cursor*/
+    void slotSetMovingState(bool);
+    void slotSetDirection(dir);
+
 private:
     QRectF boundingRect() const override;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;   //Paint the hero
     QPainterPath shape() const override;                                            //For collisions
+    QPixmap *hero_pic;
+    QPixmap *sprite_thrust;
+    dir direction;
 
-private slots:
-    void slotGameTimer();
-
-private:
-    QTimer *gameTimer;                                                              //Main game timer
-    QPointF target;                                                                 //Cursor position
+    int _thrust_offset;
+    bool is_moving;
 };
 
 #endif // HERO_H
