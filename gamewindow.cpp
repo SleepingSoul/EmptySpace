@@ -13,9 +13,14 @@ GameWindow::GameWindow(QWidget *parent) :
     pgraphics_view->setRenderHint               (QPainter::Antialiasing);
     pgraphics_view->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
     pgraphics_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    pgraphics_view->setViewportUpdateMode       (QGraphicsView::NoViewportUpdate);  /*important setting! we forbid
+                                                                                      our graphics view call update
+                                                                                      when some item change it's
+                                                                                      coords*/
 
     pgraphics_view->setScene        (pgraphics_scene);
     pgraphics_view->setSceneRect    (0, 0, 1000, 600);
+    pgraphics_scene->setSceneRect   (0, 0, 1000, 600);
     pgraphics_view->setMouseTracking(true);
 
     phero = new Hero;
@@ -24,16 +29,12 @@ GameWindow::GameWindow(QWidget *parent) :
     pgraphics_scene->addItem (phero);
     pgraphics_scene->set_hero(phero);
 
-    phthrust = new HeroThrust;
-    phthrust->setPos                (500, 500);
-    phthrust->setZValue             (0);
-    pgraphics_scene->addItem        (phthrust);
-    pgraphics_scene->set_hero_thrust(phthrust);
-
-    connect(pgraphics_scene, SIGNAL(transfer_HeroMovingState_to_HeroThrust(bool)),
-            phthrust,        SLOT  (slotSetMoving(bool)));
-    connect(pgraphics_scene, SIGNAL(transfer_HeroDirecion_to_HeroThrust(dir)),
-            phthrust,        SLOT  (slotSetDirection(dir)));
+    connect(pgraphics_scene, SIGNAL(signalTargetCoordinate(QPointF)),
+            phero,           SLOT  (slotTarget(QPointF)));
+    connect(phero,           SIGNAL(moveBackground(dir)),
+            pgraphics_scene, SLOT  (slotMoveBackground(dir)));
+    connect(pgraphics_scene, SIGNAL(signalShot(bool)),
+            phero,           SLOT(slotShot(bool)));
 }
 
 GameWindow::~GameWindow()

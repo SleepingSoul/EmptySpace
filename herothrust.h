@@ -16,9 +16,8 @@ public:
     explicit HeroThrust(QObject *parent = 0);
     ~HeroThrust();
 
-public slots:
-    void slotSetDirection(dir);
-    void slotSetMoving   (bool);
+    void setDirection(const dir);
+    void setMoving   (const bool);
 
 private /*functions*/:
     QRectF boundingRect()                                                  const override;

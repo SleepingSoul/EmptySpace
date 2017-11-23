@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>sprite_sheet.png</file>
-        <file>thrust_sprite_10.png</file>
         <file>C:/Users/katol/Desktop/Student/QTProgs/build-EmptySpace-Desktop_Qt_5_8_0_MinGW_32bit-Debug/thrust_sprite_blue.png</file>
     </qresource>
 </RCC>

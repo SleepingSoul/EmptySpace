@@ -18,7 +18,6 @@ private:
     CustomScene *pgraphics_scene;      //QGraphicsScene
     QGraphicsView *pgraphics_view;     //QGraphicsView
     Hero *phero;                        //Hero pointer
-    HeroThrust *phthrust;
 };
 
 #endif // GAMEWINDOW_H

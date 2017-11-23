@@ -92,14 +92,17 @@ void HeroThrust::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
         painter->drawPixmap(-0.5*thrust_pic.width(), 0,
                             thrust_pic.width(), thrust_pic.height(), thrust_pic);
     }
+
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }
 
-void HeroThrust::slotSetDirection(dir d)
+void HeroThrust::setDirection(const dir d)
 {
     direction = d;
 }
 
-void HeroThrust::slotSetMoving(bool mf)
+void HeroThrust::setMoving(const bool mf)
 {
     moving = mf;
 }

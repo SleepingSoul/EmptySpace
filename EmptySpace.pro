@@ -28,7 +28,9 @@ SOURCES += main.cpp\
     gamewindow.cpp \
     hero.cpp \
     decoration.cpp \
-    herothrust.cpp
+    herothrust.cpp \
+    bullet.cpp \
+    explosion.cpp
 
 HEADERS  += \
     customscene.h \
@@ -37,9 +39,11 @@ HEADERS  += \
     hero.h \
     decoration.h \
     herothrust.h \
-    direction.h
+    direction.h \
+    bullet.h \
+    project_math.h \
+    explosion.h
 
 FORMS    += widget.ui
 
-RESOURCES += \
-    images.qrc
+RESOURCES +=
