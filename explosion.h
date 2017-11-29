@@ -12,29 +12,21 @@ class Explosion : public QObject, public QGraphicsItem
     Q_OBJECT
 public:
     explicit Explosion(QObject *parent = 0);
-    /* Переопределяем тип Графического объекта взрыва,
-     * чтобы пуля могла данный объект игнорировать
-     * */
+    ~Explosion();
     enum { Type = UserType + 1 };
-
-    // Также переопределяем функцию для получения типа объекта
     int type() const;
 
-signals:
-
-public slots:
-
 private slots:
-    void nextFrame();   /// Слот для перелистывания кадров
+    void nextFrame();
 
 private:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint         (QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
     QRectF boundingRect() const;
 
 private:
-    QTimer *timer;  /// Таймер для анимации взрыва
-    QPixmap *spriteImage;   /// QPixmap для спрайта со взрывом
-    int currentFrame;   /// Координата текущего кадра в спрайте
+    QTimer * timer;
+    QPixmap *spriteImage;
+    int      currentFrame;
 };
 
 #endif // EXPLOSION_H

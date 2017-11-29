@@ -3,13 +3,17 @@
 Explosion::Explosion(QObject *parent)
     : QObject(parent)
 {
-    currentFrame = 0;       /// Координату X начала взрыва пули
+    currentFrame = 0;
     spriteImage = new QPixmap("sprite_sheet.png");
 
-    timer = new QTimer();   /// Инициализируем таймер анимации взрыва
-    /// Подключаем сигнал от таймера к слоту анимации взрыва
+    timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(nextFrame()));
-    timer->start(25);   /// Стартуем таймер с частотой 25 милисекунд
+    timer->start(18);
+}
+
+Explosion::~Explosion()
+{
+    delete spriteImage;
 }
 
 QRectF Explosion::boundingRect() const

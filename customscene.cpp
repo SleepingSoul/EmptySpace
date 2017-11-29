@@ -3,15 +3,8 @@
 
 CustomScene::CustomScene(const int w, const int h, QObject *parent)
     : QGraphicsScene(),
-      hor_offset(0),
-      ver_offset(0),
-      phero(nullptr),
-      phthrust(nullptr),
-      STEP(3),
       WIDTH(w),
-      HEIGHT(h),
-      robot_angle(0),
-      mouseClicked(false)
+      HEIGHT(h)
 {
     read_decorations(QString("decor.txt"));
 
@@ -39,6 +32,7 @@ CustomScene::~CustomScene()
 
 void CustomScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
+    //qDebug() << offsets_changed;
     QPixmap cropped;
     QRect rscn(hor_offset, ver_offset, WIDTH, HEIGHT);
     cropped = bg_image.copy(rscn);
@@ -49,7 +43,7 @@ void CustomScene::drawBackground(QPainter *painter, const QRectF &rect)
         painter->setBrush(QBrush(Qt::darkGray));
 
         foreach (QGraphicsItem *item, this->items(this->sceneRect())) { //требуется доработка!!!
-            if (item != phero) {
+            if (item != phero && item->zValue() != 5) {
                 switch (offsets_dir) {
                 case N:
                     item->setY(item->y() + STEP);
@@ -62,6 +56,7 @@ void CustomScene::drawBackground(QPainter *painter, const QRectF &rect)
                     break;
                 case E:
                     item->setX(item->x() - STEP);
+                    qDebug() << "to " << item->x();
                     break;
                 case NW:
                     item->setY(item->y() + STEP);
@@ -90,12 +85,14 @@ void CustomScene::drawBackground(QPainter *painter, const QRectF &rect)
     }
     else
         painter->drawPixmap(0, 0, WIDTH, HEIGHT, cropped);
+    offsets_changed = false;
     Q_UNUSED(rect);
 }
 
 void CustomScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     emit signalTargetCoordinate(event->scenePos());
+    QGraphicsScene::mouseMoveEvent(event);
 }
 
 void CustomScene::set_hero(Hero *h)
@@ -198,32 +195,14 @@ void CustomScene::slotMoveBackground(dir d)
     offsets_changed = true;
 }
 
-void CustomScene::set_hero_thrust(HeroThrust *ht)
-{
-    phthrust = ht;
-}
-
-void CustomScene::slotProcessBulletDestruction(QPair<Bullet::destr_type, Bullet *> bullet_info)
-{
-//    switch (bullet_info.first) {
-//    case Bullet::WITH_EXPLOSION:
-//        this->removeItem(bullet_info.second);
-//        break;
-//    case Bullet::WITHOUT_EXPLOSION:
-//        this->removeItem(bullet_info.second);
-//    }
-//    bullets.removeOne(bullet_info.second);
-//    delete bullet_info.second;
-}
-
 void CustomScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit signalShot(true);
-    Q_UNUSED(event);
+    QGraphicsScene::mousePressEvent(event);
 }
 
 void CustomScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     emit signalShot(false);
-    Q_UNUSED(event);
+    QGraphicsScene::mouseReleaseEvent(event);
 }

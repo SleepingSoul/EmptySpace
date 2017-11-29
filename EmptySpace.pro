@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,7 +30,15 @@ SOURCES += main.cpp\
     decoration.cpp \
     herothrust.cpp \
     bullet.cpp \
-    explosion.cpp
+    explosion.cpp \
+    state.cpp \
+    gameplaystate.cpp \
+    MainMenuState.cpp \
+    menuscene.cpp \
+    settingsstate.cpp \
+    settingsscene.cpp \
+    bgmusicplayer.cpp \
+    quitwindow.cpp
 
 HEADERS  += \
     customscene.h \
@@ -42,7 +50,17 @@ HEADERS  += \
     direction.h \
     bullet.h \
     project_math.h \
-    explosion.h
+    explosion.h \
+    state.h \
+    gameplaystate.h \
+    MainMenuState.h \
+    menuscene.h \
+    settingsstate.h \
+    settingsscene.h \
+    bgmusicplayer.h \
+    sizes.h \
+    sounds.h \
+    quitwindow.h
 
 FORMS    += widget.ui
 

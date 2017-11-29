@@ -26,9 +26,9 @@ private /*functions*/:
 
 private /*objects*/:
     QPixmap *sprite;
-    dir direction;
-    int offset;
-    bool moving;
+    dir      direction;
+    int      offset;
+    bool     moving;
 };
 
 #endif // HEROTHRUST_H

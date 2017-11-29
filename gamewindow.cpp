@@ -1,43 +1,45 @@
 #include "gamewindow.h"
+#include "MainMenuState.h"
+#include "gameplaystate.h"
+#include "settingsstate.h"
+#include <QPaintEngine>
 
 GameWindow::GameWindow(QWidget *parent) :
     QWidget(parent)
 {
-    // Setting up main window params
-    this->resize      (1000, 600);
-    this->setFixedSize(1000, 600);
-
-    pgraphics_view =  new QGraphicsView(this);                                 //graphics view
-    pgraphics_scene = new CustomScene  (1000, 600);                            //custom graphics scene
-
-    pgraphics_view->setRenderHint               (QPainter::Antialiasing);
-    pgraphics_view->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
-    pgraphics_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    pgraphics_view->setViewportUpdateMode       (QGraphicsView::NoViewportUpdate);  /*important setting! we forbid
-                                                                                      our graphics view call update
-                                                                                      when some item change it's
-                                                                                      coords*/
-
-    pgraphics_view->setScene        (pgraphics_scene);
-    pgraphics_view->setSceneRect    (0, 0, 1000, 600);
-    pgraphics_scene->setSceneRect   (0, 0, 1000, 600);
-    pgraphics_view->setMouseTracking(true);
-
-    phero = new Hero;
-    phero->setPos            (500, 500);
-    phero->setZValue         (1);
-    pgraphics_scene->addItem (phero);
-    pgraphics_scene->set_hero(phero);
-
-    connect(pgraphics_scene, SIGNAL(signalTargetCoordinate(QPointF)),
-            phero,           SLOT  (slotTarget(QPointF)));
-    connect(phero,           SIGNAL(moveBackground(dir)),
-            pgraphics_scene, SLOT  (slotMoveBackground(dir)));
-    connect(pgraphics_scene, SIGNAL(signalShot(bool)),
-            phero,           SLOT(slotShot(bool)));
+    state = nullptr;
+    //state_allocated_earlier = new GameplayState(this);      //pre-allocation (3-4 sec)
+    music_player = new BGMusicPlayer;
+    setState(State::MainMenu);
 }
 
 GameWindow::~GameWindow()
 {
+    delete music_player;
+}
 
+void GameWindow::setState(State::ID id)
+{
+    switch (id) {
+    case State::MainMenu:
+        if (state != nullptr) delete state;
+        state = new MainMenuState();
+        state->buildWindowState(this);
+        music_player->playMenuMusic();
+        break;
+    case State::Gameplay:
+        if (state != nullptr) delete state;
+        state = new GameplayState(this);
+        state->buildWindowState(this);
+        music_player->playGameplayMusic();
+        break;
+    case State::Settings:
+        if (state != nullptr) delete state;
+        state = new SettingsState(music_player->volume());
+        connect(dynamic_cast <SettingsState *>(state), SIGNAL(signalChangeVolume(int)),
+                music_player,                          SLOT  (setVolume(int)));
+        state->buildWindowState(this);
+        music_player->playingMenuMusic();
+        break;
+    }
 }

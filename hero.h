@@ -10,7 +10,6 @@
 #include <QCursor>
 #include <windows.h>            //!!!better to change later
 #include <herothrust.h>
-#include <QGraphicsScene>
 #include "bullet.h"
 #include "direction.h"
 #include "project_math.h"
@@ -18,6 +17,7 @@
 class Hero : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     explicit Hero(QObject *parent = 0);
     ~Hero();
@@ -31,22 +31,24 @@ public slots:
 
 private slots:
     void slotHeroTimer();
-    void slotTwirl();
-    void slotShoting();
+    void slotTwirl    ();
+    void slotShoting  ();
 
-private:
+private /*functions*/:
     QRectF boundingRect()                                                  const override;
     void paint         (QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     QPainterPath shape ()                                                  const override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value)        override;
-    QPixmap *hero_pic;
-    QTimer  *ptimer;
-    QTimer  *pshoting_timer;
-    QPointF target;
+    QVariant itemChange(GraphicsItemChange, const QVariant &)                    override;
+
+private /*objects*/:
+    QPixmap *   hero_pic;
+    QPixmap *   bullet_pic;
+    QTimer *    ptimer;
+    QTimer *    pshoting_timer;
+    QPointF     target;
     HeroThrust *pthrust;
-    const int STEP {4};
-    int shot_interval {240};
-    QPixmap *bulletPic;
+    const int   STEP {4};
+    int         shot_interval {220};
 };
 
 #endif // HERO_H

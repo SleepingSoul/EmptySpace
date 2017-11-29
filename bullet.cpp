@@ -9,6 +9,7 @@ Bullet::Bullet(const int d, QPixmap *bullet_pic, QObject *parent)
 {
     ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotTimerBullet()));
+    Q_UNUSED(d); //yet
 }
 
 Bullet::~Bullet()
@@ -23,7 +24,7 @@ QRectF Bullet::boundingRect() const
 
 void Bullet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->drawPixmap(-25, -25, 50, 50, *bulletPic);
+    painter->drawPixmap(-15, -15, 30, 30, *bulletPic);
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -49,28 +50,23 @@ void Bullet::slotTimerBullet()
                                                        << mapToScene(0, 0)
                                                        << mapToScene(-1, -1)
                                                        << mapToScene(1, -1));
-    if (!foundItems.isEmpty()) {
+    /** После чего проверяем все элементы.
+     * Одними из них будут сама Пуля и Герой - с ними ничего не делаем.
+     * А с остальными вызываем CallBack функцию
+     * */
+    foreach (QGraphicsItem *item, foundItems) {
+        /*Check items. If item is bullet or explosion,
+         * then not explode. Otherwise make explosion.*/
+        if (item == this || item->type() == (UserType + 1))
+            continue;
+
         Explosion *exp = new Explosion;
         exp->setPos(this->pos());
         scene()->addItem(exp);
         this->deleteLater();
     }
-    /** После чего проверяем все элементы.
-     * Одними из них будут сама Пуля и Герой - с ними ничего не делаем.
-     * А с остальными вызываем CallBack функцию
-     * */
-//    foreach (QGraphicsItem *item, foundItems) {
-//        /* Добавляем в проверку ещё и сами взрывы,
-//         * чтобы пули их игнорировали и не взрывались
-//         * попав во взрвым от другой пули
-//         * */
-//        if (item == this || item == phero || item->type() == (UserType + 1))
-//            continue;
-//        // При попадании по цели или препятствию, вызываем взрыв
-//    }
-    /** Проверка выхода за границы поля
-     * Если пуля вылетает за заданные границы, то пулю необходимо уничтожить
-     * */
+
+    /*Check out of scene bullets*/
     if (!scene()->sceneRect().contains(this->pos()))
         this->deleteLater();
 }
@@ -86,4 +82,9 @@ QVariant Bullet::itemChange(GraphicsItemChange change, const QVariant &value)
         ptimer->start(_timerTemp_ms);
     }
     return QGraphicsItem::itemChange(change, value);
+}
+
+int Bullet::type() const
+{
+    return Type;
 }
