@@ -15,8 +15,7 @@ Decoration::~Decoration()
 
 void Decoration::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->setBrush(QBrush(Qt::darkGray));
-    //painter->drawPolygon(form);
+    Q_UNUSED(painter);
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }

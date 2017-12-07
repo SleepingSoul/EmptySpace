@@ -15,16 +15,16 @@ class SettingsState : public State
 {
     Q_OBJECT
 public:
-    SettingsState(const int);
+    SettingsState(GameWindow *, const int, const int, const int);
     ~SettingsState();
-    void buildWindowState(GameWindow *) override;
+    QWidget *getStateWidget() const override;
 
 signals:
     void signalChangeVolume(int);
 
 private:
-    GameWindow *gwd;
-    QVBoxLayout *lout;
+    GameWindow *game_window;
+    QGridLayout *lout;
     QSlider *volume_slider;
     QPixmap *bg;
     SettingsScene *pstgs_scene;
@@ -33,6 +33,9 @@ private:
     QLabel *lbl_volume;
     QPushButton *btn_to_menu;
     QMediaPlayer *player;
+    QWidget *state_widget;
+    const int wwidth;
+    const int wheight;
 
 private slots:
     void slotChangeVolume(int);

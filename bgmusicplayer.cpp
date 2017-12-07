@@ -22,8 +22,6 @@ void BGMusicPlayer::playGameplayMusic()
     is_playing_gameplay_music = true;
     is_playing_menu_music = false;
 
-    if (player->state() == QMediaPlayer::PlayingState)
-        player->stop();
     player->setMedia(*gameplay_music);
     player->play();
 }
@@ -36,8 +34,6 @@ void BGMusicPlayer::playMenuMusic()
     is_playing_menu_music = true;
     is_playing_gameplay_music = false;
 
-    if (player->state() == QMediaPlayer::PlayingState)
-        player->stop();
     player->setMedia(*menu_music);
     player->play();
 }

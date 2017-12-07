@@ -2,6 +2,7 @@
 #define MENUSCENE_H
 
 #include <QGraphicsScene>
+class QTimer;
 
 class MenuScene : public QGraphicsScene
 {
@@ -16,6 +17,12 @@ private:
     QPixmap *logo;
     const int WIDTH;
     const int HEIGHT;
+
+    QTimer *opacity_timer;
+    qreal opacity {100};
+
+private slots:
+    void slotChangeOpacity();
 };
 
 #endif // MENUSCENE_H

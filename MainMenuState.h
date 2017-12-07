@@ -2,41 +2,47 @@
 #define MAINMENUSTATE_H
 
 #include "state.h"
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QPixmap>
-#include <QGraphicsView>
-#include <QMediaPlayer>
-#include <QTimer>
-#include <QGraphicsProxyWidget>
-#include "menuscene.h"
+
+class QPushButton;
+class QVBoxLayout;
+class QPixmap;
+class QGraphicsView;
+class QMediaPlayer;
+class QTimer;
+class QWidget;
+class MenuScene;
 
 class MainMenuState : public State
 {
     Q_OBJECT
 public:
-    MainMenuState();
+    MainMenuState(GameWindow *, const int ww, const int wh);
     ~MainMenuState();
-    void buildWindowState(GameWindow *) override;
+    QWidget *getStateWidget() const override;
 
 private:
-    QVBoxLayout          *lout;
+    QGridLayout          *lout;
     MenuScene            *pmenu_scene;
     QGraphicsView        *pgraphics_view;
-    GameWindow           *gwd;
+    GameWindow           *game_window;
     QMediaPlayer         *player;
-    QPushButton          *btnPlay;
-    QPushButton          *btnSettings;
-    QGraphicsProxyWidget *proxyPlay;
-    QGraphicsProxyWidget *proxySettings;
-    QTimer               *timerBeforeChange;
+    QPushButton          *btn_play;
+    QPushButton          *btn_settings;
+    QPushButton          *btn_about;
+    QPushButton          *btn_quit;
+    QTimer               *timer_before_change;
+    QWidget              *state_widget;
+    const int            wwidth;
+    const int            wheight;
+    void                 (*func_ptr)();
 
 private slots:
     void slotButtonPlay();
     void slotGameplayState();
     void slotSettingsState();
     void slotButtonSettings();
-    //void slotSettingsState(QMediaPlayer::MediaStatus);
+    void slotButtonQuit();
+    void slotQuitFromApp();
 };
 
 #endif // MAINMENUSTATE_H

@@ -32,7 +32,7 @@ void Explosion::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 void Explosion::nextFrame()
 {
     currentFrame += 20; // Продвигаем координату X для выбора следующего кадра
-    if (currentFrame >= 300 )
+    if (currentFrame >= 300)
         this->deleteLater();    // Если кадры закончились, то удаляем объект взрыва
 }
 

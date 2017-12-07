@@ -4,24 +4,26 @@
 #include "sizes.h"
 #include <QGraphicsProxyWidget>
 #include "sounds.h"
+#include <QTimer>
 
-#define CHANGE_T_MS 250
+#define CHANGE_T_MS 400
 
-SettingsState::SettingsState(const int vol)
+SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh, const int vol)
+    : wwidth(ww), wheight(wh), game_window(gwd)
 {
     /*allocate memory for new scene*/
-    pstgs_scene = new SettingsScene(WWIDTH, WHEIGHT);
-    pstgs_scene->setSceneRect(0, 0, WWIDTH, WHEIGHT);
+    pstgs_scene = new SettingsScene(wwidth, wheight);
+    pstgs_scene->setSceneRect(0, 0, wwidth, wheight);
 
     /*allocating memory and set up the view*/
     pgraphics_view = new QGraphicsView;
     pgraphics_view->setRenderHint               (QPainter::Antialiasing);
     pgraphics_view->setVerticalScrollBarPolicy  (Qt::ScrollBarAlwaysOff);
     pgraphics_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    pgraphics_view->setScene(pstgs_scene);
+    pgraphics_view->setScene                    (pstgs_scene);
 
     /*deal with layout*/
-    lout = new QVBoxLayout;
+    lout = new QGridLayout;
     lout->setContentsMargins(0, 0, 0, 0);
     lout->addWidget(pgraphics_view);
 
@@ -65,6 +67,11 @@ SettingsState::SettingsState(const int vol)
     player->setMedia(QUrl::fromLocalFile(SELECT_SOUND));
 
     timer_before_change = new QTimer(this);
+
+    /*Set up state widget*/
+    state_widget = new QWidget;
+    state_widget->setFixedSize(wwidth, wheight);
+    state_widget->setLayout(lout);
 }
 
 SettingsState::~SettingsState()
@@ -74,13 +81,12 @@ SettingsState::~SettingsState()
     delete player;
     delete pstgs_scene;
     delete pgraphics_view;
-    qDebug() << gwd->children().size();
+    qDebug() << "SS destr";
 }
 
-void SettingsState::buildWindowState(GameWindow *gwd)
+QWidget *SettingsState::getStateWidget() const
 {
-    this->gwd = gwd;
-    gwd->setLayout(lout);
+    return state_widget;
 }
 
 void SettingsState::slotChangeVolume(int v)
@@ -99,5 +105,6 @@ void SettingsState::slotBtnToMenuClicked()
 void SettingsState::slotMenuState()
 {
     timer_before_change->stop();
-    gwd->setState(State::MainMenu);
+    player->stop();
+    game_window->setState(State::MainMenu);
 }

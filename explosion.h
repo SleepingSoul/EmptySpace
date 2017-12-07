@@ -24,9 +24,9 @@ private:
     QRectF boundingRect() const;
 
 private:
-    QTimer * timer;
+    QTimer  *timer;
     QPixmap *spriteImage;
-    int      currentFrame;
+    int     currentFrame;
 };
 
 #endif // EXPLOSION_H

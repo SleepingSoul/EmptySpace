@@ -3,9 +3,7 @@
 #include <QPainter>
 
 SettingsScene::SettingsScene(const int w, const int h, QObject *parent)
-    : QGraphicsScene(parent),
-      WIDTH(w),
-      HEIGHT(h)
+    : QGraphicsScene(parent), wwidth(w), wheight(h)
 {
     bg = new QPixmap  ("bg_settings.jpg");
 }
@@ -17,6 +15,6 @@ SettingsScene::~SettingsScene()
 
 void SettingsScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    painter->drawPixmap(0, 0, WIDTH, HEIGHT, *bg);
+    painter->drawPixmap(0, 0, wwidth, wheight, *bg);
     Q_UNUSED(rect);
 }

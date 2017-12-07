@@ -13,6 +13,7 @@
 #include "bullet.h"
 #include "direction.h"
 #include "project_math.h"
+class Gun;
 
 class Hero : public QObject, public QGraphicsItem
 {
@@ -24,6 +25,7 @@ public:
 
 signals:
     void moveBackground(dir);
+    void moveBackground(qreal);
 
 public slots:
     void slotTarget(QPointF);
@@ -31,8 +33,7 @@ public slots:
 
 private slots:
     void slotHeroTimer();
-    void slotTwirl    ();
-    void slotShoting  ();
+    void slotButtons  (QSet <Qt::Key> &);
 
 private /*functions*/:
     QRectF boundingRect()                                                  const override;
@@ -42,13 +43,13 @@ private /*functions*/:
 
 private /*objects*/:
     QPixmap *   hero_pic;
-    QPixmap *   bullet_pic;
     QTimer *    ptimer;
     QTimer *    pshoting_timer;
     QPointF     target;
     HeroThrust *pthrust;
+    Gun        *pgun;
+    QSet <Qt::Key> keys;
     const int   STEP {4};
-    int         shot_interval {220};
 };
 
 #endif // HERO_H

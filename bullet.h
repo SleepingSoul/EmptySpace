@@ -10,15 +10,15 @@ class Bullet : public QObject, public QGraphicsItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
-    enum destr_type{WITH_EXPLOSION = 0, WITHOUT_EXPLOSION};
     enum {Type = UserType + 1};
 
-    explicit Bullet(const int d, QPixmap *, QObject *parent = 0);
+    explicit Bullet(const int, QPixmap *, QObject * = 0);
     ~Bullet();
-    int Damage()  const;
-    QPointF Pos() const;
+
+    int Damage     () const;
+    QPointF Pos    () const;
     QPointF nextPos();
-    int type() const override;
+    int type       () const override;
 
 private /*functions*/:
     QRectF boundingRect()                                                  const override;
@@ -27,8 +27,8 @@ private /*functions*/:
     QVariant itemChange(GraphicsItemChange, const QVariant &)                    override;
 
 private /*objects*/:
-    QTimer *  ptimer;
-    QPixmap * bulletPic;
+    QTimer    *ptimer;
+    QPixmap   *bulletPic;
     const int damage {25};
 
     static const int _timerTemp_ms {15};

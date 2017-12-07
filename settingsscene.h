@@ -13,8 +13,8 @@ public:
 private:
     void drawBackground(QPainter *painter, const QRectF &rect) override;
     QPixmap *bg;
-    const int WIDTH;
-    const int HEIGHT;
+    const int wwidth;
+    const int wheight;
 };
 
 #endif // SETTINGSSCENE_H

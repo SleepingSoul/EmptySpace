@@ -3,16 +3,18 @@
 
 #include <QObject>
 class GameWindow;
+class QGridLayout;
+class QGraphicsView;
 
 class State : public QObject
 {
     Q_OBJECT
 public:
-    enum ID{MainMenu = 0, Gameplay, Settings};
+    enum ID{MainMenu = 0, Settings, Gameplay, About};
 
     State() {}
     virtual ~State() {}
-    virtual void buildWindowState(GameWindow *) = 0;
+    virtual QWidget *getStateWidget() const = 0;
 };
 
 #endif // STATE_H
