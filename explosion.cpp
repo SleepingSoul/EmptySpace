@@ -1,4 +1,7 @@
 #include "explosion.h"
+#include <QTimer>
+#include <QPixmap>
+#include <QPainter>
 
 Explosion::Explosion(QObject *parent)
     : QObject(parent)
@@ -39,4 +42,14 @@ void Explosion::nextFrame()
 int Explosion::type() const
 {
     return Type;
+}
+
+void Explosion::stopTime()
+{
+    timer->stop();
+}
+
+void Explosion::startTime()
+{
+    timer->start(18);
 }

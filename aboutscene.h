@@ -10,9 +10,14 @@ public:
     explicit AboutScene(const int w, const int h, QObject *parent = 0);
     ~AboutScene();
 
-private:
+private /*functions*/:
     void drawBackground(QPainter *, const QRectF &) override;
+
+private /*objects*/:
+    /*background scene image*/
     QPixmap   *bg;
+
+    /*sizes*/
     const int width;
     const int height;
 };

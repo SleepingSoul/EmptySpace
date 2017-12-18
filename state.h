@@ -2,6 +2,9 @@
 #define STATE_H
 
 #include <QObject>
+#include <QPixmap>
+#include <QCursor>
+
 class GameWindow;
 class QGridLayout;
 class QGraphicsView;

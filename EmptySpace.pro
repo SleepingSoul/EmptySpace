@@ -42,7 +42,10 @@ SOURCES += main.cpp\
     aboutscene.cpp \
     gun.cpp \
     gamescene.cpp \
-    gameview.cpp
+    gameview.cpp \
+    flamestream.cpp \
+    state.cpp \
+    customtextitem.cpp
 
 HEADERS  += \
     myapplication.h \
@@ -50,7 +53,6 @@ HEADERS  += \
     hero.h \
     decoration.h \
     herothrust.h \
-    direction.h \
     bullet.h \
     project_math.h \
     explosion.h \
@@ -68,8 +70,14 @@ HEADERS  += \
     aboutscene.h \
     gun.h \
     gamescene.h \
-    gameview.h
+    gameview.h \
+    gameplayitem.h \
+    flamestream.h \
+    templates.h \
+    customtextitem.h
 
 FORMS    += widget.ui
 
 RESOURCES +=
+
+DISTFILES +=

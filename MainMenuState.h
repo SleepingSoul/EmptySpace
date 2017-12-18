@@ -2,6 +2,7 @@
 #define MAINMENUSTATE_H
 
 #include "state.h"
+#include <QSettings>
 
 class QPushButton;
 class QVBoxLayout;
@@ -11,6 +12,9 @@ class QMediaPlayer;
 class QTimer;
 class QWidget;
 class MenuScene;
+class QGraphicsSimpleTextItem;
+class QLabel;
+class CustomTextItem;
 
 class MainMenuState : public State
 {
@@ -20,7 +24,12 @@ public:
     ~MainMenuState();
     QWidget *getStateWidget() const override;
 
-private:
+public slots:
+    void slotChangeWallpaper(int);
+
+private /*objects*/:
+    QSettings settings;
+
     QGridLayout          *lout;
     MenuScene            *pmenu_scene;
     QGraphicsView        *pgraphics_view;
@@ -31,10 +40,14 @@ private:
     QPushButton          *btn_about;
     QPushButton          *btn_quit;
     QTimer               *timer_before_change;
+    QTimer               *timer_current_time;
     QWidget              *state_widget;
+    CustomTextItem *text_time;
     const int            wwidth;
     const int            wheight;
-    void                 (*func_ptr)();
+
+private /*functions*/:
+    void readSettings();
 
 private slots:
     void slotButtonPlay();
@@ -42,6 +55,11 @@ private slots:
     void slotSettingsState();
     void slotButtonSettings();
     void slotButtonQuit();
+    void slotButtonAbout();
+    void slotAboutState();
+
+    void slotUpdateTime();
+
     void slotQuitFromApp();
 };
 

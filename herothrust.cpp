@@ -1,12 +1,16 @@
 #include "herothrust.h"
+#include <QPainter>
+#include <QPixmap>
+#include <QTimer>
+#include <QGraphicsScene>
+#include <QDebug>
 
 HeroThrust::HeroThrust(QObject *parent)
-    : QObject(parent),
-      QGraphicsItem(),
-      offset(0),
-      moving(false)
+    : QObject(parent)
 {
-    sprite = new QPixmap("thrust_sprite_blue.png");
+    sprite = new QPixmap("thrust_sp.png");
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(slotTick()));
 }
 
 HeroThrust::~HeroThrust()
@@ -28,81 +32,86 @@ QPainterPath HeroThrust::shape() const
 
 void HeroThrust::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QPixmap thrust_pic;
-    QRect cut_rect;
-
-    if (moving) {
-        if (offset / 30 > 8)
-            cut_rect.setRect(270, 0, 30, 140);
+    if (movingNow)
+        if (_counter++ < 10)
+            painter->drawPixmap(-15, -60, 30, 120, sprite->copy(offset, 0, 30, 120));
         else {
-            cut_rect.setRect(offset, 0, 30, 140);
-            offset += 30;
+            if (_flag_1 == 0) {
+                _direction = true;
+                _flag_1 = 1;
+                painter->drawPixmap(-15, -60, 30, 120, sprite->copy(180, 0, 30, 120));
+            }
+            else if (_flag_1 == 1) {
+                _flag_1 = _direction? 2 : 0;
+                painter->drawPixmap(-15, -60, 30, 120, sprite->copy(210, 0, 30, 120));
+            }
+            else if (_flag_1 == 2) {
+                _flag_1 = _direction? 3 : 1;
+                painter->drawPixmap(-15, -60, 30, 120, sprite->copy(240, 0, 30, 120));
+            }
+            else {
+                _direction = false;
+                _flag_1 = 2;
+                painter->drawPixmap(-15, -60, 30, 120, sprite->copy(270, 0, 30, 120));
+            }
         }
-        moving = false;
-    }
     else {
-        if (offset / 30 > 0) {
-            cut_rect.setRect(offset, 0, 30, 140);
-            offset -= 30;
+        _counter = 0;
+        if (_flag_2 == 0) {
+            _flag_2 = 1;
+            painter->drawPixmap(-15, -60, 30, 120, sprite->copy(0, 0, 30, 120));
         }
-        else
-            cut_rect.setRect(0, 0, 30, 140);
-    }
-
-    thrust_pic = sprite->copy(cut_rect);
-
-    switch (direction) {
-    case NE:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(45));
-        painter->drawPixmap(-1*thrust_pic.width(), 0,
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case SE:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(135));
-        painter->drawPixmap(-1*thrust_pic.width(), -1*thrust_pic.height(),
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case SW:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(-135));
-        painter->drawPixmap(0, -1*thrust_pic.height(),
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case NW:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(-45));
-        painter->drawPixmap(0, 0,
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case E:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(90));
-        painter->drawPixmap(-1*thrust_pic.width(), -0.5*thrust_pic.height(),
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case S:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(180));
-        painter->drawPixmap(-0.5*thrust_pic.width(), -1 * thrust_pic.height(),
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case W:
-        thrust_pic = thrust_pic.transformed(QTransform().rotate(-90));
-        painter->drawPixmap(0, -0.5*thrust_pic.height(),
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
-        break;
-    case N:
-        //do nothing
-        painter->drawPixmap(-0.5*thrust_pic.width(), 0,
-                            thrust_pic.width(), thrust_pic.height(), thrust_pic);
+        else {
+            _flag_2 = 0;
+            painter->drawPixmap(-15, -60, 30, 120, sprite->copy(30, 0, 30, 120));
+        }
     }
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
 
-void HeroThrust::setDirection(const dir d)
+QVariant HeroThrust::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    direction = d;
+    if (change == ItemSceneChange && value.value <QGraphicsScene *>()) {
+        timer->start(30);
+    }
+    return QGraphicsItem::itemChange(change, value);
 }
 
-void HeroThrust::setMoving(const bool mf)
+void HeroThrust::stopTime()
 {
-    moving = mf;
+    timer->stop();
+}
+
+void HeroThrust::startTime()
+{
+    timer->start(30);
+}
+
+void HeroThrust::slotTick()
+{
+//    if (movingNow && dir) {
+//        offset += 30;
+//        if (offset == 270)
+//            dir = false;
+//    }
+//    else if (movingNow && !dir){
+//        offset -= 30;
+//        if (offset == 0)
+//            dir = true;
+//    }
+    if (movingNow) {
+        if (offset <= 240)
+            offset += 30;
+    }
+    else {
+        if (offset >= 0)
+            offset -= 30;
+    }
+}
+
+void HeroThrust::setMoving(const bool m)
+{
+    movingNow = m;
 }

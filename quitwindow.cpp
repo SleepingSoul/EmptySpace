@@ -5,12 +5,12 @@
 QuitWindow::QuitWindow()
      : QGraphicsItem()
 {
-    pic = new QPixmap("quit_pic.png");
+    pic = new QPixmap("panel_bg.png");
 }
 
 QuitWindow::~QuitWindow()
 {
-
+    delete pic;
 }
 
 void QuitWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget)
@@ -21,4 +21,14 @@ void QuitWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, 
 QRectF QuitWindow::boundingRect() const
 {
     return QRectF(pic->width() / -2, pic->height() / -2, pic->width(), pic->height());
+}
+
+int QuitWindow::width() const
+{
+    return pic->width();
+}
+
+int QuitWindow::height() const
+{
+    return pic->height();
 }

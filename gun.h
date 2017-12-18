@@ -3,15 +3,20 @@
 
 #include <QObject>
 #include <QGraphicsItem>
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QDebug>
-#include <cassert>
-#include "direction.h"
+#include "gameplayitem.h"
+
 class QTimer;
 class QPixmap;
+class FlameStream;
+class QMediaPlayer;
+class QMediaPlaylist;
 
-class Gun : public QObject, public QGraphicsItem
+/* Parent classes:
+ * QObject: for signals/slots;
+ * QGraphicsItem: for placing on the scene;
+ * GameplayItem: to eneble/disable timers */
+
+class Gun : public QObject, public QGraphicsItem, public GameplayItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
@@ -19,6 +24,9 @@ public:
     explicit Gun(QObject *parent = 0);\
     ~Gun();
     void shoot(const bool);
+
+    void stopTime() override;
+    void startTime() override;
 
 public slots:
     void slotTarget(QPointF);
@@ -30,11 +38,15 @@ private /*objects*/:
     QPixmap *bullet_pic;
     QPointF target;
     QPixmap *pic;
+    FlameStream *fs;
+    QMediaPlayer *player;
+    QMediaPlaylist *playlist;
     int     shot_interval {220};
 
 private /*functions*/:
     QRectF boundingRect()                                                  const override;
     void paint         (QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private slots:
     void slotTwirl();

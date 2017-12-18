@@ -14,6 +14,12 @@
 #include <QVBoxLayout>
 #include <QMediaPlayer>
 #include "gameview.h"
+#include "gameplayitem.h"
+#include <QTimer>
+#include <QDateTime>
+#include <QLabel>
+#include <QStyle>
+#include "templates.h"
 
 #define CHANGE_T_MS 250
 
@@ -37,13 +43,14 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     pgraphics_view->setScene                    (pgraphics_scene);
     pgraphics_view->setSceneRect                (0, 0, wwidth, wheight);
     pgraphics_scene->setSceneRect               (0, 0, 10000, 10000);
-    pgraphics_view->setMouseTracking(true);
+    pgraphics_view->setMouseTracking            (true);
     pgraphics_view->setCursor(QCursor(QPixmap("game_cursor.png")));
 
     phero->setPos            (500, 500);
-    phero->setZValue         (1);
+    phero->setZValue         (2);
+    phero->setRotation       (90);
     pgraphics_scene->addItem (phero);
-    pgraphics_scene->setHero(phero);
+    pgraphics_scene->setHero (phero);
 
     connect(pgraphics_scene, SIGNAL(signalTargetCoordinate(QPointF)),
             phero,           SLOT  (slotTarget(QPointF)));
@@ -59,34 +66,43 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
 
     /*Buttons set up*/
     btn_to_menu = new QPushButton;
-    btn_to_menu->setIcon(QIcon(QPixmap("btnBackMenu.png")));
-    btn_to_menu->setIconSize(QSize(240, 52.12));
-    btn_to_menu->setFixedSize(240, 52.12);
+    setUpButton(btn_to_menu, "btnBackMenu.png");
 
-    QRegion reg(QPolygon() << QPoint(0,10) << QPoint(10, 0) << QPoint(240, 0) << QPoint(240, 42.12) <<
-                QPoint(230, 52.12) << QPoint(0, 52.12));
+    btn_pause = new QPushButton;
+    setUpButton(btn_pause, "btnPause.png");
 
-    btn_to_menu->setMask(reg);
+    /*Date/time*/
+    lbl_time = new QLabel(QDateTime::currentDateTime().time().toString());
+    QFont font("Museo Slab");
+    lbl_time->setStyleSheet("QLabel {color: white;}");
+    font.setPointSize(16);
+    font.setBold(true);
+    lbl_time->setFont(font);
 
+    /*Header layout*/
+    QHBoxLayout *header = new QHBoxLayout;
+    header->addWidget(btn_to_menu, 1, Qt::AlignLeft);
+    header->addWidget(lbl_time, 1, Qt::AlignCenter);
+    header->addWidget(btn_pause, 1, Qt::AlignRight);
+
+    /*Connections*/
     connect(btn_to_menu, SIGNAL(clicked(bool)), SLOT(slotButtonToMenuClicked()));
-    lout->addWidget(btn_to_menu);
+    connect(btn_pause, SIGNAL(clicked(bool)), SLOT(slotButtonPauseClicked()));
+
+    /*Set up main layout*/
+    lout->addLayout(header);
     lout->addWidget(pgraphics_view);
 
-    btn_quit = new QPushButton;
-    btn_quit->setFixedSize(175, 50);
-
-    btn_dont_quit = new QPushButton;
-    btn_dont_quit->setFixedSize(175, 50);
 
     /*Sounds set up*/
     player = new QMediaPlayer;
     player->setMedia(QUrl::fromLocalFile(SELECT_SOUND));
 
     timer_before_change = new QTimer(this);
+    change_time_timer = new QTimer(this);
+    connect(change_time_timer, SIGNAL(timeout()), SLOT(slotUpdateTime()));
+    change_time_timer->start(1000);
 
-//    QGraphicsProxyWidget *proxyBtnMenu = pgraphics_scene->addWidget(btn_to_menu);
-//    proxyBtnMenu->setPos   (50, 50);
-//    proxyBtnMenu->setZValue(5);     //it is how we will recognize this button on the scene
 
     /*Set up state widget*/
     state_widget = new QWidget;
@@ -98,10 +114,6 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     palette.setBrush(QPalette::Background, brush);
     state_widget->setAutoFillBackground(true);
     state_widget->setPalette(palette);
-    QCursor cursor(QPixmap("menu_cursor.png"));
-    state_widget->setCursor(cursor);
-
-    btn_to_menu->setCursor(cursor);
 }
 
 GameplayState::~GameplayState()
@@ -117,51 +129,75 @@ QWidget *GameplayState::getStateWidget() const
     return state_widget;
 }
 
-QGraphicsView *GameplayState::getScene() const
+QGraphicsView *GameplayState::getView() const
 {
     return pgraphics_view;
 }
 
 void GameplayState::slotButtonToMenuClicked()
 {
-    quitHandler();
-    QPushButton *btnOk = new QPushButton("Ok");
-    QPushButton *btnNo = new QPushButton("No");
-    btnOk->setFixedSize(175, 50);
-    btnNo->setFixedSize(175, 50);
-    connect(btnOk, SIGNAL(clicked(bool)), SLOT(slotQuitConfirmed()));
-    connect(btnNo, SIGNAL(clicked(bool)), SLOT(slotDontQuit()));
+    btn_to_menu->setEnabled(false);
+
+    if (!paused)
+        slotButtonPauseClicked(); //pause
+
+    //We disable button pause to avoid enabling game during quit window exists
+    btn_pause->setEnabled(false);
+
+    quit_window = new QuitWindow;
+    pgraphics_scene->addItem(quit_window);
+
+    int central_x(pgraphics_view->sceneRect().x() + pgraphics_view->sceneRect().width() / 2),
+        central_y(pgraphics_view->sceneRect().y() + pgraphics_view->sceneRect().height() / 2),
+               dx(quit_window->width() / 2), dy(quit_window->height() / 2);
+
+    quit_window->setPos(central_x, central_y);
+    quit_window->setZValue(5);
+
+    QPushButton *btnOk = new QPushButton;
+    QPushButton *btnNo = new QPushButton;
+
+    setUpButton(btnOk, "btnYesQuit.png");
+    setUpButton(btnNo, "btnCancel.png");
 
     proxy_btn_ok = pgraphics_scene->addWidget(btnOk);
     proxy_btn_no = pgraphics_scene->addWidget(btnNo);
-    proxy_btn_ok->setPos(QPoint(wwidth / 2. - 100 - 175./2, wheight / 2. + 50));
-    proxy_btn_no->setPos(QPoint(wheight / 2. + 100 - 175./2, wheight / 2. + 50));
+
+    proxy_btn_ok->setPos(central_x - dx + 40, central_y + dy - btnOk->height() - 40);
+    proxy_btn_no->setPos(central_x + dx - 40 - btnNo->width(), central_y + dy - btnOk->height() - 40);
+
     proxy_btn_ok->setZValue(5);
     proxy_btn_no->setZValue(5);
 
+    connect(btnOk, SIGNAL(clicked(bool)), SLOT(slotQuitConfirmed()));
+    connect(btnNo, SIGNAL(clicked(bool)), SLOT(slotDontQuit()));
 }
 
 void GameplayState::slotMenuState()
 {
-    //qDebug() << "Set menu state from GameplayState called.";
+
+    //we enable pause button now (it was disabled yet, during quit window existing period)
+    btn_pause->setEnabled(true);
+    btn_to_menu->setEnabled(true);
+
     timer_before_change->stop();
+
     disconnect(timer_before_change, SIGNAL(timeout()), this, SLOT(slotMenuState()));
+
     pgraphics_scene->removeItem(quit_window);
     pgraphics_scene->removeItem(proxy_btn_ok);
     pgraphics_scene->removeItem(proxy_btn_no);
+
     game_window->setState(State::MainMenu);
 }
 
 void GameplayState::quitHandler()
 {
-    quit_window = new QuitWindow();
-    pgraphics_scene->addItem(quit_window);
-    quit_window->setPos(QPoint(wwidth / 2., wheight / 2.));
-    quit_window->setZValue(5);
+
 }
 
 void GameplayState::slotQuitConfirmed()
-{
+{  
     player->play();
     connect(timer_before_change, SIGNAL(timeout()), SLOT(slotMenuState()));
     timer_before_change->start(CHANGE_T_MS);
@@ -169,7 +205,43 @@ void GameplayState::slotQuitConfirmed()
 
 void GameplayState::slotDontQuit()
 {
+    //we enable pause button now (it was disabled yet, during quit window existing period)
+    btn_pause->setEnabled(true);
+    btn_to_menu->setEnabled(true);
+
     pgraphics_scene->removeItem(quit_window);
     pgraphics_scene->removeItem(proxy_btn_ok);
     pgraphics_scene->removeItem(proxy_btn_no);
+
+    //Set off pause
+    this->slotButtonPauseClicked();
+}
+
+void GameplayState::slotButtonPauseClicked()
+{
+    if (paused) {
+        pgraphics_view->setFocus();
+        btn_pause->setIcon(QIcon(QPixmap("btnPause.png")));
+        paused = false;
+        foreach (auto item, pgraphics_scene->items()) {
+            dynamic_cast <GameplayItem *>(item)->startTime();
+        }
+    }
+    else {
+        btn_pause->setIcon(QIcon(QPixmap("btnPlay.png")));
+        paused = true;
+        foreach (auto item, pgraphics_scene->items()) {
+            dynamic_cast <GameplayItem *>(item)->stopTime();
+        }
+    }
+}
+
+void GameplayState::slotUpdateTime()
+{
+    static bool flag(false);
+    auto str = QDateTime::currentDateTime().time().toString();
+    QString hours(str.left(2));
+    QString mins(str.mid(3, 2));
+    lbl_time->setText(hours + " " + (flag? ":" : " ") + " " + mins);
+    flag = !flag;
 }

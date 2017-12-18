@@ -1,36 +1,46 @@
 #include "gamescene.h"
 #include "project_math.h"
+#include <QGraphicsSceneMouseEvent>
+#include <QPixmap>
+#include <cassert>
+#include <QFile>
+#include <QTextStream>
+#include <QKeyEvent>
+#include "decoration.h"
+#include "hero.h"
+#include <QTimer>
+#include <QDebug>
+#include <QGraphicsView>
 
 GameScene::GameScene(const int w, const int h, QObject *parent)
     : QGraphicsScene(), wwidth(w), wheight(h)
 {
     readDecorations(QString("decor.txt"));
 
-    foreach(Decoration *dec, dec_vec) {
+    foreach(Decoration *dec, dec_list) {
         this->addItem(dec);
-        dec->set_def_pos(dec->pos().toPoint());
     }
 
-    bg_image.load("galaxy_map10kx10k.jpg");
+    bg_image = new QPixmap("map_picture.jpg");
 
     fps_timer = new QTimer(this);
     connect(fps_timer, SIGNAL(timeout()), SLOT(slotUpdateViewport()));
-    fps_timer->start(18);
+    fps_timer->start(17);
 
     Q_UNUSED(parent);
 }
 
 GameScene::~GameScene()
 {
-    foreach(Decoration *dec, dec_vec) {
-        this->removeItem(dec);
-        delete dec;
-    }
+    qDeleteAll(dec_list);
 }
 
 void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    painter->drawPixmap(0, 0, bg_image);
+    /*Maybe we could optimise it*/
+    //painter->drawPixmap(rect.toRect(), bg_image->copy(rect.x() + 500, rect.y() + 500, rect.width(), rect.height()));
+    painter->drawPixmap(-500, -500, *bg_image);
+    //have no idea why, but second variant is a little bit FASTER than 1.
     Q_UNUSED(rect);
 }
 
@@ -56,12 +66,13 @@ void GameScene::readDecorations(const QString fileName)
         while (!tstream.atEnd()) {
             str = tstream.readLine();
 
-            if (str.startsWith("//"))
+            if (str.startsWith("//"))   /*commentary string*/
                 continue;
 
             QStringList lst = str.split(' ', QString::SkipEmptyParts);
 
             if (lst.size() % 2 != 0) {
+                /*Maybe, we should make exception here*/
                 qDebug() << "Wrong coords string! Reading of string <" << str << "> failed!";
                 continue;
             }
@@ -69,12 +80,14 @@ void GameScene::readDecorations(const QString fileName)
             QPolygon poly;
 
             for (auto s_it = lst.cbegin(); s_it != lst.cend(); s_it += 2) {
-                poly.push_back(QPoint((*s_it).toInt(), (*(s_it + 1)).toInt()));             //!can be dangerous!
+                poly.push_back(QPoint((*s_it).toInt(), (*(s_it + 1)).toInt()));
             }
-            dec_vec.push_back(new Decoration(poly));
+
+            dec_list.push_back(new Decoration(poly));
         }
     }
     else {
+        /*Maybe. we should throw exception here*/
         qDebug() << "No decorations file!";
     }
 }
@@ -86,7 +99,6 @@ void GameScene::slotUpdateViewport()
 
 void GameScene::targetCoordinate(QPointF point)
 {
-    //Rotate hero straight to cursor target
     target = point;
 }
 
@@ -105,13 +117,14 @@ void GameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void GameScene::keyPressEvent(QKeyEvent *event)
 {
     if ((static_cast <Qt::Key>(event->key()) == Qt::Key_W ||
-        static_cast <Qt::Key>(event->key()) == Qt::Key_A ||
-        static_cast <Qt::Key>(event->key()) == Qt::Key_S ||
-        static_cast <Qt::Key>(event->key()) == Qt::Key_D) &&
-        pr_keys.size() < 2)
+         static_cast <Qt::Key>(event->key()) == Qt::Key_A ||
+         static_cast <Qt::Key>(event->key()) == Qt::Key_S ||
+         static_cast <Qt::Key>(event->key()) == Qt::Key_D) &&
+         pr_keys.size() < 2)
     {
         pr_keys.insert(static_cast <Qt::Key>(event->key()));
     }
+
     emit signalButtons(pr_keys);
     QGraphicsScene::keyPressEvent(event);
 }

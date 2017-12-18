@@ -9,10 +9,14 @@
 #include <QPixmap>
 #include <QRegion>
 #include <QVBoxLayout>
+#include <QWidget>
 #include "gamewindow.h"
+#include "templates.h"
+#include "sounds.h"
+#include <QLabel>
 
-AboutState::AboutState(const int ww, const int wh)
-    : wwidth(ww), wheight(wh)
+AboutState::AboutState(GameWindow *gwd, const int ww, const int wh)
+    : wwidth(ww), wheight(wh), game_window(gwd)
 {
     /*Allocating memory for scene*/
     pabout_scene = new AboutScene(wwidth, wheight);
@@ -26,6 +30,22 @@ AboutState::AboutState(const int ww, const int wh)
 
     /*Set up music*/
     player = new QMediaPlayer;
+    player->setMedia(QUrl::fromLocalFile(SELECT_SOUND));
+
+    /*Set up about text*/
+    QGraphicsTextItem *text = pabout_scene->addText("This program had been fully made by \n"
+                                                    "NTUU_KPI::FICT::IK-62 student of second year\n"
+                                                    "Katolikian Tihran. \nContacts: \n"
+                                                    "Telegram: @ever_last_1ng \n"
+                                                    "Facebook: /tihran.katolikian.3\n"
+                                                    "\n"
+                                                    "                                           All rights reserved.");
+    QFont font;
+    font.setBold(true);
+    font.setPointSize(25);
+    text->setPos(200, 200);
+    text->setFont(font);
+    text->setDefaultTextColor(Qt::white);
 
     /*Set up layout*/
     lout = new QGridLayout;
@@ -34,20 +54,18 @@ AboutState::AboutState(const int ww, const int wh)
 
     /*Allocate memory and set up buttons*/
     btn_menu = new QPushButton;
-    btn_menu->setIcon(QIcon(QPixmap("btnBackMenu.png")));
-    btn_menu->setIconSize(QSize(240, 52.12));
-    btn_menu->setFixedSize(240, 52.12);
-
-    /*This is shape for my custom button*/
-    QRegion reg(QPolygon() << QPoint(0,10) << QPoint(10, 0) << QPoint(240, 0) << QPoint(240, 42.12) <<
-                QPoint(230, 52.12) << QPoint(0, 52.12));
-
-    btn_menu->setMask(reg);
+    setUpButton(btn_menu, "btnBackMenu.png");
 
     QGraphicsProxyWidget *proxy_back_menu = pabout_scene->addWidget(btn_menu);
     proxy_back_menu->setPos(50, 50);
+    connect(btn_menu, SIGNAL(clicked(bool)), SLOT(slotBtnMenuClicked()));
 
     timer_before_change = new QTimer(this);
+
+    /*Set up state widget*/
+    state_widget = new QWidget;
+    state_widget->setFixedSize(wwidth, wheight);
+    state_widget->setLayout   (lout);
 }
 
 AboutState::~AboutState()
@@ -57,14 +75,23 @@ AboutState::~AboutState()
 
 QWidget *AboutState::getStateWidget() const
 {
-
+    return state_widget;
 }
 void AboutState::slotBtnMenuClicked()
 {
-
+    player->play();
+    connect(timer_before_change, SIGNAL(timeout()), SLOT(slotMenuState()));
+    timer_before_change->start(CHANGE_T_MS);
 }
 
 void AboutState::slotMenuState()
 {
+    timer_before_change->stop();
+    player->stop();
 
+    /*We disconnect this, because if next time user will be there, this connection would be
+     * already enabled and we  would connect it second time. As a result, we would had 2 main menu state calls. */
+    disconnect(timer_before_change, SIGNAL(timeout()), this, SLOT(slotMenuState()));
+
+    game_window->setState(State::MainMenu);
 }

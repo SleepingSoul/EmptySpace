@@ -3,19 +3,19 @@
 
 #include <QObject>
 #include <QGraphicsItem>
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QDebug>
-#include <QTimer>
-#include <QCursor>
-#include <windows.h>            //!!!better to change later
-#include <herothrust.h>
-#include "bullet.h"
-#include "direction.h"
-#include "project_math.h"
-class Gun;
+#include <QSet>
+#include "gameplayitem.h"
 
-class Hero : public QObject, public QGraphicsItem
+class QTimer;
+class Gun;
+class HeroThrust;
+
+/*Parent classes:
+ * QObject: for signals/slots;
+ * QGraphicsItem: for placing on the scene;
+ * GameplayItem: to eneble/disable timers */
+
+class Hero : public QObject, public QGraphicsItem, public GameplayItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
@@ -23,8 +23,10 @@ public:
     explicit Hero(QObject *parent = 0);
     ~Hero();
 
+    void stopTime() override;
+    void startTime() override;
+
 signals:
-    void moveBackground(dir);
     void moveBackground(qreal);
 
 public slots:
@@ -41,15 +43,19 @@ private /*functions*/:
     QPainterPath shape ()                                                  const override;
     QVariant itemChange(GraphicsItemChange, const QVariant &)                    override;
 
+    void moveSystem(const QPointF &);
+    void updateThrustsPos();
+
 private /*objects*/:
-    QPixmap *   hero_pic;
-    QTimer *    ptimer;
-    QTimer *    pshoting_timer;
-    QPointF     target;
-    HeroThrust *pthrust;
-    Gun        *pgun;
+    QPixmap        *hero_pic;
+    QTimer         *ptimer;
+    QTimer         *pshoting_timer;
+    QPointF        target;
+    Gun            *pgun;
     QSet <Qt::Key> keys;
-    const int   STEP {4};
+    HeroThrust     *left_th;
+    HeroThrust     *right_th;
+    const int      STEP {4};
 };
 
 #endif // HERO_H

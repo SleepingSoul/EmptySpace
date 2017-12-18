@@ -3,32 +3,49 @@
 
 #include <QObject>
 #include <QGraphicsItem>
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QDebug>
-#include <cassert>
-#include "direction.h"
+#include "gameplayitem.h"
 
-class HeroThrust : public QObject, public QGraphicsItem
+class QTimer;
+class QPixmap;
+
+class HeroThrust : public QObject, public QGraphicsItem, public GameplayItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
+    enum {Type = UserType + 1};
+
     explicit HeroThrust(QObject *parent = 0);
     ~HeroThrust();
 
-    void setDirection(const dir);
-    void setMoving   (const bool);
+    int type() const
+    {
+        return Type;
+    }
+
+    void stopTime() override;
+    void startTime() override;
+    void setMoving(const bool);
 
 private /*functions*/:
-    QRectF boundingRect()                                                  const override;
-    void paint         (QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
-    QPainterPath shape ()                                                  const override;
-
+    QRectF boundingRect() const override;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    QPainterPath shape() const override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 private /*objects*/:
     QPixmap *sprite;
-    dir      direction;
-    int      offset;
-    bool     moving;
+    int     offset {30};
+    QTimer  *timer;
+    bool movingNow {false};
+
+    /*objects required for thrusts changing realization*/
+    unsigned short _flag_1 {0};
+    unsigned short _flag_2 {0};
+    unsigned short _counter{0};
+    bool _direction;
+
+private slots:
+    void slotTick();
 };
 
 #endif // HEROTHRUST_H

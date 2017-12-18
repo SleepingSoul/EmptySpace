@@ -1,9 +1,10 @@
 #include "bgmusicplayer.h"
+#include <QDebug>
 
 BGMusicPlayer::BGMusicPlayer()
 {
     player = new QMediaPlayer;
-    gameplay_music = new QMediaContent(QUrl::fromLocalFile("Public Enemy.mp3"));
+    gameplay_music = new QMediaContent(QUrl::fromLocalFile("Heaven's Devils.mp3"));
     menu_music = new QMediaContent(QUrl::fromLocalFile("Wings of Liberty.mp3"));
 }
 
@@ -40,6 +41,7 @@ void BGMusicPlayer::playMenuMusic()
 
 void BGMusicPlayer::setVolume(int v)
 {
+    qDebug() << "Set volume: " << v;
     player->setVolume(v);
 }
 

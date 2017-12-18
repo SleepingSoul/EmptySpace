@@ -21,6 +21,7 @@ public:
     GameWindow();
     ~GameWindow();
     void setState(State::ID);
+    QCursor getStandardCursor() const;
 
 private:
     /*Widnow states*/
@@ -29,10 +30,8 @@ private:
     State           *gameplay_state;
     State           *about_state;
 
-    /*Main view elements: Scene, View and it's layout*/
-//    CustomScene     *pgraphics_scene;
-//    QGraphicsView   *pgraphics_view;
-//    QVBoxLayout     *main_layout;
+    QCursor standard_cursor;
+
     BGMusicPlayer   *music_player;
     int             wwidth;
     int             wheight;

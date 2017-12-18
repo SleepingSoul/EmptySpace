@@ -1,6 +1,10 @@
 #include "bullet.h"
 #include <math.h>
 #include "project_math.h"
+#include <QTimer>
+#include <QPainter>
+#include <QGraphicsScene>
+#include "explosion.h"
 
 Bullet::Bullet(const int d, QPixmap *bullet_pic, QObject *parent)
     : QObject(parent),
@@ -41,19 +45,10 @@ void Bullet::slotTimerBullet()
 {
     this->setPos(mapToParent(0, -7));
 
-    /** Производим проверку на то, наткнулась ли пуля на какой-нибудь
-     * элемент на графической сцене.
-     * Для этого определяем небольшую область перед пулей,
-     * в которой будем искать элементы
-     * */
     QList<QGraphicsItem *> foundItems = scene()->items(QPolygonF()
                                                        << mapToScene(0, 0)
                                                        << mapToScene(-1, -1)
                                                        << mapToScene(1, -1));
-    /** После чего проверяем все элементы.
-     * Одними из них будут сама Пуля и Герой - с ними ничего не делаем.
-     * А с остальными вызываем CallBack функцию
-     * */
     foreach (QGraphicsItem *item, foundItems) {
         /*Check items. If item is bullet or explosion,
          * then not explode. Otherwise make explosion.*/
@@ -87,4 +82,14 @@ QVariant Bullet::itemChange(GraphicsItemChange change, const QVariant &value)
 int Bullet::type() const
 {
     return Type;
+}
+
+void Bullet::stopTime()
+{
+    ptimer->stop();
+}
+
+void Bullet::startTime()
+{
+    ptimer->start(_timerTemp_ms);
 }

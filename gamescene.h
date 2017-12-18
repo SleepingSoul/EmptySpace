@@ -1,14 +1,13 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include <QGraphicsSceneMouseEvent>
-#include <QPixmap>
-#include <cassert>
-#include <QFile>
-#include <QTextStream>
-#include <QKeyEvent>
-#include "decoration.h"
-#include "hero.h"
+#include <QGraphicsScene>
+#include <QSet>
+#include <QList>
+
+class QPixmap;
+class Decoration;
+class Hero;
 
 class GameScene : public QGraphicsScene
 {
@@ -17,7 +16,7 @@ public:
     explicit GameScene(const int, const int, QObject * = 0);
     ~GameScene();
 
-    void readDecorations       (const QString);             //read decoration polygons from file
+    void readDecorations(const QString);             //read decoration polygons from file
     void setHero(Hero *);
 
 signals:
@@ -39,9 +38,9 @@ private /*functions*/:
 
 private /*objects*/:
     Hero *phero;
-    QVector <Decoration *> dec_vec;             //vector which contains all Decorations;
+    QList <Decoration *>   dec_list;            //vector which contains all Decorations;
     QSet <Qt::Key>         pr_keys;             //set which contains all legal pressed and not released keys;
-    QPixmap                bg_image;
+    QPixmap                *bg_image;
     QTimer                 *fps_timer;
     QPointF                target;
     qreal                  hero_angle;

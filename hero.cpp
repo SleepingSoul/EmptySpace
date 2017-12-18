@@ -3,15 +3,27 @@
 #include "sizes.h"
 #include "gun.h"
 #include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QPainter>
+#include <QDebug>
+#include <QTimer>
+#include <QCursor>
+#include <herothrust.h>
+#include "bullet.h"
+#include "direction.h"
 #include "project_math.h"
 
 Hero::Hero(QObject *parent)
     : QObject(parent), QGraphicsItem()
 {
-    setRotation(0);
     hero_pic = new QPixmap("spaceship.png");
     ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotHeroTimer()));
+
+    left_th = new HeroThrust;
+    right_th = new HeroThrust;
+    left_th->setZValue(1);
+    right_th->setZValue(1);
 }
 
 Hero::~Hero()
@@ -35,6 +47,7 @@ QPainterPath Hero::shape() const
 
 void Hero::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    qDebug() << "paint call";
     painter->drawPixmap(hero_pic->width() / -10, hero_pic->height() / -10, hero_pic->width() / 5,
                         hero_pic->height() / 5, *hero_pic);
 
@@ -44,29 +57,50 @@ void Hero::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
 void Hero::slotHeroTimer()
 {
+    static bool activated(false);
+
+    if (!keys.empty()) {
+        left_th->setMoving(true);
+        right_th->setMoving(true);
+        activated = true;
+    }
+    else {
+        left_th->setMoving(false);
+        right_th->setMoving(false);
+        if (activated) {
+            moveSystem({0, -1});
+            if (scene()->collidingItems(this).size() != 2) {
+                moveSystem({0, 1});
+            }
+        }
+    }
     /*We move spaceship depends of current key set*/
     if (keys.contains(Qt::Key_W)) {
-        this->setPos(mapToParent(0, -3));
-        if (scene()->collidingItems(this).size() != 1) {
-            this->setPos(mapToParent(0, 3));
+        moveSystem({0, -3});
+        if (scene()->collidingItems(this).size() != 2) {
+            moveSystem({0, 3});
         }
     }
     if (keys.contains(Qt::Key_S)) {
-        this->setPos(mapToParent(0, 3));
-        if (scene()->collidingItems(this).size() != 1) {
-            this->setPos(mapToParent(0, -3));
+        moveSystem({0, 3});
+        if (scene()->collidingItems(this).size() != 2) {
+            moveSystem({0, -3});
         }
     }
     if (keys.contains(Qt::Key_A)) {
         this->setRotation(this->rotation() - 1);
-        if (scene()->collidingItems(this).size() != 1) {
+        updateThrustsPos();
+        if (scene()->collidingItems(this).size() != 2) {
             this->setRotation(this->rotation() + 1);
+            updateThrustsPos();
         }
     }
     if (keys.contains(Qt::Key_D)) {
         this->setRotation(this->rotation() + 1);
-        if (scene()->collidingItems(this).size() != 1) {
+        updateThrustsPos();
+        if (scene()->collidingItems(this).size() != 2) {
             this->setRotation(this->rotation() - 1);
+            updateThrustsPos();
         }
     }
 
@@ -81,7 +115,18 @@ void Hero::slotHeroTimer()
     qreal angle = normalizeDegrees(this->rotation());
 
     /*Very complicated alghorithm of camera (view) moving*/
-    if (keys.contains(Qt::Key_W)) {
+    if (keys.contains(Qt::Key_S)) {
+        if ((x() < cur_rect.x() + 600                     && !(angle <= 360 && angle >= 180)) ||
+            (x() > cur_rect.x() + cur_rect.width() - 600  && !(angle >= 0 && angle <= 180))  ||
+            (y() < cur_rect.y() + 400                     && !(angle >= 270 && angle <= 360 ||
+                                                               angle >= 0 && angle <= 90)) ||
+            (y() > cur_rect.y() + cur_rect.height() - 400 && !(angle >= 90 && angle <= 270)))
+        {
+            view->setSceneRect(cur_rect.translated(-3*qSin(qDegreesToRadians(angle)),
+                                                   3*qCos(qDegreesToRadians(angle))));
+        }
+    }
+    else {
         if ((x() < cur_rect.x() + 600                     && angle <= 360 && angle >= 180) ||
             (x() > cur_rect.x() + cur_rect.width() - 600  && angle >= 0 && angle <= 180)  ||
             (y() < cur_rect.y() + 400                     && (angle >= 270 && angle <= 360 ||
@@ -92,16 +137,42 @@ void Hero::slotHeroTimer()
                                                    -3*qCos(qDegreesToRadians(angle))));
         }
     }
-    else if (keys.contains(Qt::Key_S)) {
-        if ((x() < cur_rect.x() + 600                     && !(angle <= 360 && angle >= 180)) ||
-            (x() > cur_rect.x() + cur_rect.width() - 600  && !(angle >= 0 && angle <= 180))  ||
-            (y() < cur_rect.y() + 400                     && !(angle >= 270 && angle <= 360 ||
-                                                               angle >= 0 && angle <= 90)) ||
-            (y() > cur_rect.y() + cur_rect.height() - 400 && !(angle >= 90 && angle <= 270)))
-        {
-            view->setSceneRect(cur_rect.translated(-3*qSin(qDegreesToRadians(angle)),
-                                                   3*qCos(qDegreesToRadians(angle))));
-        }
+}
+
+void Hero::moveSystem(const QPointF &point)
+{
+    //point is in this item's coordinate system
+    this->setPos(mapToParent(point));
+    left_th->setPos(mapToParent(point.x() - 30, point.y() + 100));
+    right_th->setPos(mapToParent(point.x() + 30, point.y() + 100));
+    updateThrustsPos();
+}
+
+void Hero::updateThrustsPos()
+{
+    left_th->setPos(mapToParent(-30, 100));
+    right_th->setPos(mapToParent(30, 100));
+
+    left_th->setRotation(this->rotation());
+    right_th->setRotation(this->rotation());
+    if (keys.contains(Qt::Key_S)) {
+        left_th->setPos(mapToParent(-55, -50));
+        right_th->setPos(mapToParent(55, -50));
+        left_th->setRotation(180 + this->rotation());
+        right_th->setRotation(180 + this->rotation());
+    }
+
+    if (keys.contains(Qt::Key_A)) {
+        left_th->setRotation(left_th->rotation() + 30);
+        left_th->setPos(mapToParent(-50, 105));
+        if (keys.contains(Qt::Key_S))
+            left_th->setPos(mapToParent(-35, -50));
+    }
+    else if (keys.contains(Qt::Key_D)) {
+        right_th->setRotation(left_th->rotation() - 30);
+        right_th->setPos(mapToParent(50, 105));
+        if (keys.contains(Qt::Key_S))
+            right_th->setPos(mapToParent(35, -50));
     }
 }
 
@@ -118,9 +189,17 @@ QVariant Hero::itemChange(GraphicsItemChange change, const QVariant &value)
          * them on this scene*/
 
         pgun = new Gun;
-        pgun->setZValue(2);
+        pgun->setZValue(3);
         value.value <QGraphicsScene *>()->addItem(pgun);
+
+        value.value <QGraphicsScene *>()->addItem(left_th);
+        value.value <QGraphicsScene *>()->addItem(right_th);
+
+        moveSystem({0, 0});
+        updateThrustsPos();
+
         ptimer->start(18);
+
     }
     return QGraphicsItem::itemChange(change, value);
 }
@@ -133,4 +212,15 @@ void Hero::slotShot(bool f)
 void Hero::slotButtons(QSet<Qt::Key> &keyset)
 {
     keys = keyset;
+}
+
+void Hero::stopTime()
+{
+    ptimer->stop();
+}
+
+void Hero::startTime()
+{
+    keys.clear();
+    ptimer->start(18);
 }

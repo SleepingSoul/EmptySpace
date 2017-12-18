@@ -4,6 +4,9 @@
 #include <QMediaPlayer>
 #include <QObject>
 
+/*Class provides background music, that is independent from
+ * GameWindow states*/
+
 class BGMusicPlayer : public QObject
 {
     Q_OBJECT

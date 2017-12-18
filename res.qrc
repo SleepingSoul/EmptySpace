@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>SettingsSlider.qml</file>
+    </qresource>
+</RCC>

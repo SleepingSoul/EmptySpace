@@ -8,22 +8,29 @@
 #include <QMediaPlayer>
 #include <QTimer>
 #include <QWidget>
+#include <QGraphicsTextItem>
 #include <QGraphicsProxyWidget>
 #include "menuscene.h"
 #include "mainmenustate.h"
 #include "gamewindow.h"
 #include "gameplaystate.h"
 #include "sizes.h"
-
-#define SELECT_SOUND "select_btn_sound.mp3"
-#define CHANGE_T_MS 400
+#include "templates.h"
+#include "sounds.h"
+#include <QDateTime>
+#include <QLabel>
+#include <QGraphicsSimpleTextItem>
+#include "customtextitem.h"
 
 MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
-    : wwidth(ww), wheight(wh), game_window(gwd)
+    : wwidth(ww), wheight(wh), game_window(gwd),
+      settings(QApplication::organizationName(), QApplication::applicationName())
 {
     /*Allocate memory and set up of menu scene*/
     pmenu_scene = new MenuScene                 (wwidth, wheight);
     pmenu_scene->setSceneRect                   (0, 0, wwidth, wheight);
+
+    readSettings();
 
     /*Allocate memory and set up for graphics view widget, which will
      * contain out scene and will be built into our main "GameWidget"*/
@@ -42,36 +49,22 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
     btn_about = new QPushButton;
     btn_quit = new QPushButton;
 
-    /*Set up buttons design*/
-    btn_play->setIcon         (QIcon(QPixmap("btnPlay.png")));
-    btn_settings->setIcon     (QIcon(QPixmap("btnSettings.png")));
-    btn_about->setIcon        (QIcon(QPixmap("btnAbout.png")));
-    btn_quit->setIcon         (QIcon(QPixmap("btnQuit.png")));
-
-    btn_play->setIconSize     (QSize(240, 52.12));
-    btn_settings->setIconSize (QSize(240, 52.12));
-    btn_about->setIconSize    (QSize(240, 52.12));
-    btn_quit->setIconSize     (QSize(240, 52.12));
-
-    /*This is shape for my custom button*/
-    QRegion reg(QPolygon() << QPoint(0,10) << QPoint(10, 0) << QPoint(240, 0) << QPoint(240, 42.12) <<
-                QPoint(230, 52.12) << QPoint(0, 52.12));
-
-    btn_play->setMask    (reg);
-    btn_settings->setMask(reg);
-    btn_about->setMask   (reg);
-    btn_quit->setMask    (reg);
-
-    btn_play->setFixedSize    (240, 52.12);
-    btn_settings->setFixedSize(240, 52.12);
-    btn_about->setFixedSize   (240, 52.12);
-    btn_quit->setFixedSize    (240, 52.12);
+    /*Set up buttons*/
+    setUpButton(btn_play, "btnPlay.png");
+    setUpButton(btn_settings, "btnSettings.png");
+    setUpButton(btn_about, "btnAbout.png");
+    setUpButton(btn_quit, "btnQuit.png");
 
     /*Make buttons proxy to built them into scene*/
     QGraphicsProxyWidget *proxy_play = pmenu_scene->addWidget    (btn_play);
     QGraphicsProxyWidget *proxy_settings = pmenu_scene->addWidget(btn_settings);
     QGraphicsProxyWidget *proxy_about  = pmenu_scene->addWidget  (btn_about);
     QGraphicsProxyWidget *proxy_quit = pmenu_scene->addWidget    (btn_quit);
+
+    /*Time*/
+    text_time = new CustomTextItem;
+    pmenu_scene->addItem(text_time);
+    text_time->setPos(wwidth - 200, 100);
 
     /*Set up position of buttons on the scene*/
     proxy_play->setPos    (100, 200);
@@ -83,6 +76,7 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
     connect(btn_play,     SIGNAL(clicked(bool)), SLOT(slotButtonPlay()));
     connect(btn_settings, SIGNAL(clicked(bool)), SLOT(slotButtonSettings()));
     connect(btn_quit,     SIGNAL(clicked(bool)), SLOT(slotButtonQuit()));
+    connect(btn_about,    SIGNAL(clicked(bool)), SLOT(slotButtonAbout()));
 
     /*Allocate and set up layout*/
     lout = new QGridLayout;
@@ -91,7 +85,10 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
 
     /*Allocate memory for timer, which will make a little pause after
      * button click till widget changes*/
-    timer_before_change = new QTimer;
+    timer_before_change = new QTimer(this);
+    timer_current_time = new QTimer(this);
+    connect(timer_current_time, SIGNAL(timeout()), SLOT(slotUpdateTime()));
+    timer_current_time->start(30);
 
     /*Set up state widget*/
     state_widget = new QWidget;
@@ -117,7 +114,6 @@ MainMenuState::~MainMenuState()
     delete btn_quit;
     delete timer_before_change;
     delete pgraphics_view;
-    qDebug() << "Scene objects: " << pmenu_scene->items().size() << " " << pmenu_scene->children().front();
     delete pmenu_scene;
 }
 
@@ -171,6 +167,15 @@ void MainMenuState::slotSettingsState()
     game_window->setState(State::Settings);
 }
 
+void MainMenuState::slotAboutState()
+{
+    timer_before_change->stop();
+    disconnect(timer_before_change, SIGNAL(timeout()), this, SLOT(slotAboutState()));
+    player->stop();
+
+    game_window->setState(State::About);
+}
+
 void MainMenuState::slotButtonQuit()
 {
     player->stop();
@@ -181,7 +186,36 @@ void MainMenuState::slotButtonQuit()
     timer_before_change->start(CHANGE_T_MS);
 }
 
+void MainMenuState::slotButtonAbout()
+{
+    player->stop();
+    player->setMedia(QUrl::fromLocalFile(SELECT_SOUND));
+    player->play();
+
+    connect(timer_before_change, SIGNAL(timeout()), SLOT(slotAboutState()));
+    timer_before_change->start(CHANGE_T_MS);
+}
+
 void MainMenuState::slotQuitFromApp()
 {
     QApplication::quit();
+}
+
+void MainMenuState::slotChangeWallpaper(int idx)
+{
+    pmenu_scene->setBackgroundImage(idx);
+}
+
+void MainMenuState::readSettings()
+{
+    settings.beginGroup("/Settings");
+    int bg_index(settings.value("/bg_index", 0).toInt());
+    settings.endGroup();
+
+    pmenu_scene->setBackgroundImage(bg_index);
+}
+
+void MainMenuState::slotUpdateTime()
+{
+    pmenu_scene->update();
 }
