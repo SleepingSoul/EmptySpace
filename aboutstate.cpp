@@ -33,17 +33,18 @@ AboutState::AboutState(GameWindow *gwd, const int ww, const int wh)
     player->setMedia(QUrl::fromLocalFile(SELECT_SOUND));
 
     /*Set up about text*/
-    QGraphicsTextItem *text = pabout_scene->addText("This program had been fully made by \n"
+    QGraphicsTextItem *text = pabout_scene->addText("This program had been fully developed by \n"
                                                     "NTUU_KPI::FICT::IK-62 student of second year\n"
                                                     "Katolikian Tihran. \nContacts: \n"
                                                     "Telegram: @ever_last_1ng \n"
-                                                    "Facebook: /tihran.katolikian.3\n"
-                                                    "\n"
-                                                    "                                           All rights reserved.");
+                                                    "Facebook: /tihran.katolikian.3\n\n"
+                                                    "Moreover, you can check it's software update and\n"
+                                                    "different versions on my GitHub!\n"
+                                                    "https://github.com/SleepingSoul\n");
     QFont font;
     font.setBold(true);
-    font.setPointSize(25);
-    text->setPos(200, 200);
+    font.setPointSize(15);
+    text->setPos(120, 145);
     text->setFont(font);
     text->setDefaultTextColor(Qt::white);
 

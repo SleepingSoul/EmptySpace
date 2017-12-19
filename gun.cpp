@@ -20,13 +20,13 @@ Gun::Gun(QObject *parent)
     shooting_timer = new QTimer();
     connect(shooting_timer, SIGNAL(timeout()), SLOT(slotShooting()));
     connect(timer,          SIGNAL(timeout()), SLOT(slotTwirl()));
-    player = new QMediaPlayer;
-    player->setMedia(QMediaContent(QUrl::fromLocalFile("shoot.wav")));
-    player->setVolume(100);
-    //playlist = new QMediaPlaylist();
-    //playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot.wav")));
-    //playlist->setPlaybackMode(QMediaPlaylist::Loop);
-    //player->setPlaylist(playlist);
+    //player = new QMediaPlayer;
+    //player->setMedia(QMediaContent(QUrl::fromLocalFile("shoot2.mp3")));
+//    player->setVolume(100);
+//    playlist = new QMediaPlaylist();
+//    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot4.mp3")));
+//    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+//    player->setPlaylist(playlist);
     fs = new FlameStream(this);
     fs->setPos(mapToParent(0, -80));
     timer->start(18);
@@ -85,10 +85,12 @@ void Gun::setTarget(const QPointF point)
 void Gun::shoot(const bool f)
 {
     if (f) {
+        //player->play();
         shooting_timer->start(shot_interval);
         fs->shootCall(true);
     }
     else {
+        //player->stop();
         shooting_timer->stop();
         fs->shootCall(false);
     }
@@ -96,7 +98,6 @@ void Gun::shoot(const bool f)
 
 void Gun::slotShooting()
 {
-    player->play();
     Bullet *bullet = new Bullet(25, bullet_pic);
     bullet->setPos(mapToParent(0, -100));
     bullet->setRotation(this->rotation());

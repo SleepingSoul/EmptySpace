@@ -44,8 +44,8 @@ private /*objects*/:
     int     shot_interval {220};
 
 private /*functions*/:
-    QRectF boundingRect()                                                  const override;
-    void paint         (QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
+    QRectF boundingRect() const override;
+    void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private slots:

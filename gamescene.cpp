@@ -11,6 +11,10 @@
 #include <QTimer>
 #include <QDebug>
 #include <QGraphicsView>
+#include <QProgressBar>
+#include <QGraphicsProxyWidget>
+#include "hpline.h"
+#include "minimap.h"
 
 GameScene::GameScene(const int w, const int h, QObject *parent)
     : QGraphicsScene(), wwidth(w), wheight(h)
@@ -22,6 +26,12 @@ GameScene::GameScene(const int w, const int h, QObject *parent)
     }
 
     bg_image = new QPixmap("map_picture.jpg");
+
+    hp_line = new HpLine();
+    mini_map = new MiniMap();
+
+    this->addItem(hp_line);
+    this->addItem(mini_map);
 
     fps_timer = new QTimer(this);
     connect(fps_timer, SIGNAL(timeout()), SLOT(slotUpdateViewport()));
@@ -37,11 +47,12 @@ GameScene::~GameScene()
 
 void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    /*Maybe we could optimise it*/
-    //painter->drawPixmap(rect.toRect(), bg_image->copy(rect.x() + 500, rect.y() + 500, rect.width(), rect.height()));
     painter->drawPixmap(-500, -500, *bg_image);
-    //have no idea why, but second variant is a little bit FASTER than 1.
-    Q_UNUSED(rect);
+
+    /*Paint footer*/
+    hp_line->setPos(rect.x() + rect.width() / 2. - 350, rect.y() + rect.height() - 30);
+    mini_map->setHeroPos(phero->pos());
+    mini_map->setPos(rect.x() + 10, rect.y() + rect.height() - 260);
 }
 
 void GameScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -134,4 +145,9 @@ void GameScene::keyReleaseEvent(QKeyEvent *event)
     pr_keys.remove(static_cast <Qt::Key>(event->key()));
     emit signalButtons(pr_keys);
     QGraphicsScene::keyReleaseEvent(event);
+}
+
+void GameScene::setView(QGraphicsView *v)
+{
+    view = v;
 }

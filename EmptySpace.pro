@@ -45,7 +45,9 @@ SOURCES += main.cpp\
     gameview.cpp \
     flamestream.cpp \
     state.cpp \
-    customtextitem.cpp
+    customtextitem.cpp \
+    hpline.cpp \
+    minimap.cpp
 
 HEADERS  += \
     myapplication.h \
@@ -74,7 +76,9 @@ HEADERS  += \
     gameplayitem.h \
     flamestream.h \
     templates.h \
-    customtextitem.h
+    customtextitem.h \
+    hpline.h \
+    minimap.h
 
 FORMS    += widget.ui
 

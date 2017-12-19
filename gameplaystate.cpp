@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QStyle>
 #include "templates.h"
+#include "hpline.h"
 
 #define CHANGE_T_MS 250
 
@@ -41,10 +42,12 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
      coords*/
     pgraphics_view->setViewportUpdateMode       (QGraphicsView::NoViewportUpdate);
     pgraphics_view->setScene                    (pgraphics_scene);
-    pgraphics_view->setSceneRect                (0, 0, wwidth, wheight);
+    pgraphics_view->setSceneRect                (0, 0, wwidth - 2, wheight - 150);
     pgraphics_scene->setSceneRect               (0, 0, 10000, 10000);
     pgraphics_view->setMouseTracking            (true);
     pgraphics_view->setCursor(QCursor(QPixmap("game_cursor.png")));
+
+    pgraphics_scene->setView(pgraphics_view);
 
     phero->setPos            (500, 500);
     phero->setZValue         (2);

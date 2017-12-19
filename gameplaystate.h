@@ -17,6 +17,7 @@ class QGraphicsScene;
 class GameView;
 class QDateTime;
 class QLabel;
+class HpLine;
 
 class GameplayState : public State
 {

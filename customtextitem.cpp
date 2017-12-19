@@ -26,7 +26,7 @@ void CustomTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->drawText(0, 0, QDateTime::currentDateTime().time().toString().left(5));
     font.setPointSize(15);
     painter->setFont(font);
-    painter->drawText(70, 30, QDateTime::currentDateTime().date().toString("ddd.MM"));
+    painter->drawText(70, 30, QDateTime::currentDateTime().date().toString("ddd.dd"));
 
     changeOpacity();
 

@@ -8,6 +8,9 @@
 class QPixmap;
 class Decoration;
 class Hero;
+class HpLine;
+class MiniMap;
+class QGraphicsView;
 
 class GameScene : public QGraphicsScene
 {
@@ -18,6 +21,7 @@ public:
 
     void readDecorations(const QString);             //read decoration polygons from file
     void setHero(Hero *);
+    void setView(QGraphicsView *);
 
 signals:
     void signalTargetCoordinate(QPointF);
@@ -41,9 +45,14 @@ private /*objects*/:
     QList <Decoration *>   dec_list;            //vector which contains all Decorations;
     QSet <Qt::Key>         pr_keys;             //set which contains all legal pressed and not released keys;
     QPixmap                *bg_image;
+    QBrush                 *footer_brush;
+    QPolygon               footer_polygon;
     QTimer                 *fps_timer;
     QPointF                target;
+    HpLine                 *hp_line;
+    MiniMap                *mini_map;
     qreal                  hero_angle;
+    QGraphicsView          *view;
     const int              wwidth;
     const int              wheight;
     const int              STEP {3};
