@@ -42,7 +42,7 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
      coords*/
     pgraphics_view->setViewportUpdateMode       (QGraphicsView::NoViewportUpdate);
     pgraphics_view->setScene                    (pgraphics_scene);
-    pgraphics_view->setSceneRect                (0, 0, wwidth - 2, wheight - 150);
+    pgraphics_view->setSceneRect                (500 - wwidth / 2., 500 - wheight / 2., wwidth - 2, wheight - 150);
     pgraphics_scene->setSceneRect               (0, 0, 10000, 10000);
     pgraphics_view->setMouseTracking            (true);
     pgraphics_view->setCursor(QCursor(QPixmap("game_cursor.png")));
