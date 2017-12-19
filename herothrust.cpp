@@ -20,7 +20,7 @@ HeroThrust::~HeroThrust()
 
 QRectF HeroThrust::boundingRect() const
 {
-    return QRectF(-15, -35, 30, 70);
+    return QRectF(-30, -50, 60, 100);
 }
 
 QPainterPath HeroThrust::shape() const

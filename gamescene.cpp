@@ -47,7 +47,7 @@ GameScene::~GameScene()
 
 void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    painter->drawPixmap(-500, -500, *bg_image);
+    painter->drawPixmap(-1000, -1000, *bg_image);
 
     /*Paint footer*/
     hp_line->setPos(rect.x() + rect.width() / 2. - 350, rect.y() + rect.height() - 30);
