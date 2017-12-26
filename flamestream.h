@@ -1,26 +1,17 @@
 #ifndef FLAMESTREAM_H
 #define FLAMESTREAM_H
 
-#include <QGraphicsItem>
 #include <QObject>
 #include "gameplayitem.h"
 
 class QTimer;
 
-class FlameStream : public QObject, public QGraphicsItem, public GameplayItem
+class FlameStream : public QObject, public GameplayItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 public:
-    enum {Type = UserType + 1};
-
     explicit FlameStream(QObject *parent = 0);
     ~FlameStream();
-
-    int type() const
-    {
-        return Type;
-    }
 
     void stopTime() override {}
     void startTime() override {}

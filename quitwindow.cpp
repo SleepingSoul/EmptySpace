@@ -3,7 +3,6 @@
 #include "sizes.h"
 
 QuitWindow::QuitWindow()
-     : QGraphicsItem()
 {
     pic = new QPixmap("panel_bg.png");
 }

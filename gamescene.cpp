@@ -57,7 +57,7 @@ void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
 
 void GameScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit signalTargetCoordinate(event->scenePos());
+    emit signalTargetCoordinate();
     QGraphicsScene::mouseMoveEvent(event);
 }
 
@@ -108,19 +108,16 @@ void GameScene::slotUpdateViewport()
     this->update();
 }
 
-void GameScene::targetCoordinate(QPointF point)
-{
-    target = point;
-}
-
 void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << "press";
     emit signalShot(true);
     QGraphicsScene::mousePressEvent(event);
 }
 
 void GameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << "release";
     emit signalShot(false);
     QGraphicsScene::mouseReleaseEvent(event);
 }

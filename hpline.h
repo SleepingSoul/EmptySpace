@@ -2,9 +2,8 @@
 #define HPLINE_H
 
 #include "gameplayitem.h"
-#include <QGraphicsItem>
 
-class HpLine : public QGraphicsItem, public GameplayItem
+class HpLine : public GameplayItem
 {
 public:
     enum {Type = UserType + 1};

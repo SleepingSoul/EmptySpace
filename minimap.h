@@ -1,10 +1,9 @@
 #ifndef MINIMAP_H
 #define MINIMAP_H
 
-#include <QGraphicsItem>
 #include "gameplayitem.h"
 
-class MiniMap : public QGraphicsItem, public GameplayItem
+class MiniMap : public GameplayItem
 {
 public:
     enum {Type = UserType + 1};

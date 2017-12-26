@@ -13,8 +13,6 @@ public:
     ~GameView();
 
 private:
-    void focusInEvent(QFocusEvent *event) override;
-    void focusOutEvent(QFocusEvent *event) override;
     QPixmap cursor_pic;
 };
 

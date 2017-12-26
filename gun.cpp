@@ -10,9 +10,12 @@
 #include "flamestream.h"
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
+#include <QCursor>
+#include <QGraphicsView>
 
-Gun::Gun(QObject *parent)
-    : QObject(parent), QGraphicsItem()
+Gun::Gun(GameplayMovableItem *h, QObject *parent)
+    : QObject(parent),
+      hero(h)
 {
     pic = new QPixmap("tower.png");
     bullet_pic = new QPixmap("bullet_1.png");
@@ -20,13 +23,12 @@ Gun::Gun(QObject *parent)
     shooting_timer = new QTimer();
     connect(shooting_timer, SIGNAL(timeout()), SLOT(slotShooting()));
     connect(timer,          SIGNAL(timeout()), SLOT(slotTwirl()));
-    //player = new QMediaPlayer;
-    //player->setMedia(QMediaContent(QUrl::fromLocalFile("shoot2.mp3")));
-//    player->setVolume(100);
-//    playlist = new QMediaPlaylist();
-//    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot4.mp3")));
-//    playlist->setPlaybackMode(QMediaPlaylist::Loop);
-//    player->setPlaylist(playlist);
+    player = new QMediaPlayer;
+    player->setVolume(100);
+    playlist = new QMediaPlaylist();
+    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot_sound.wav")));
+    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+    player->setPlaylist(playlist);
     fs = new FlameStream(this);
     fs->setPos(mapToParent(0, -80));
     timer->start(18);
@@ -37,9 +39,10 @@ Gun::~Gun()
 
 }
 
-void Gun::slotTarget(QPointF point)
+void Gun::updateTarget()
 {
-    target = point;
+    //a little bit complicated algorithm of determination of current cursor position on the scene
+    target = QCursor::pos() + QPointF(scene()->views().front()->sceneRect().topLeft()) - QPointF(2, 90);
 }
 
 void Gun::slotTwirl()
@@ -67,7 +70,7 @@ void Gun::slotTwirl()
 
 void Gun::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->drawPixmap(pic->width() / -10, pic->height() / -10, pic->width() / 5, pic->height() / 5, *pic);
+    painter->drawPixmap(pic->width() / -2, pic->height() / -2, pic->width(), pic->height(), *pic);
     Q_UNUSED(option);
     Q_UNUSED(widget);
 }
@@ -77,20 +80,19 @@ QRectF Gun::boundingRect() const
     return QRectF(-20, -40, 40, 80);
 }
 
-void Gun::setTarget(const QPointF point)
-{
-    target = point;
-}
-
 void Gun::shoot(const bool f)
 {
-    if (f) {
-        //player->play();
+    if (f && !is_paused) {
+        playlist->setPlaybackMode(QMediaPlaylist::Loop);
+        player->play();
+        is_shooting = true;
+        slotShooting();             /*instant shot when button pressed*/
         shooting_timer->start(shot_interval);
         fs->shootCall(true);
     }
     else {
-        //player->stop();
+        playlist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+        is_shooting = false;
         shooting_timer->stop();
         fs->shootCall(false);
     }
@@ -98,7 +100,7 @@ void Gun::shoot(const bool f)
 
 void Gun::slotShooting()
 {
-    Bullet *bullet = new Bullet(25, bullet_pic);
+    Bullet *bullet = new Bullet(25, bullet_pic, hero);
     bullet->setPos(mapToParent(0, -100));
     bullet->setRotation(this->rotation());
     bullet->setZValue(2);
@@ -107,12 +109,14 @@ void Gun::slotShooting()
 
 void Gun::stopTime()
 {
+    is_paused = true;
     timer->stop();
     shooting_timer->stop();
 }
 
 void Gun::startTime()
 {
+    is_paused = false;
     timer->start(18);
 }
 
@@ -122,4 +126,9 @@ QVariant Gun::itemChange(GraphicsItemChange change, const QVariant &value)
         value.value <QGraphicsScene *>()->addItem(fs);
     }
     return QGraphicsItem::itemChange(change, value);
+}
+
+bool Gun::isShooting() const
+{
+    return is_shooting;
 }

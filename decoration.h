@@ -9,15 +9,17 @@
  * QGraphicsItem: for placing on the scene;
  * GameplayItem: to eneble/disable timers */
 
-class Decoration : public QGraphicsItem, public GameplayItem
+class Decoration : public GameplayItem
 {
 public:
+    enum {ImpassableType = UserType + 2};
     explicit Decoration(QPolygon);
     ~Decoration();
     //void set_polygon(QPolygon);
     //QPolygon Polygon() const;
     //void set_def_pos(const QPoint);
     //QPoint def_pos  () const;
+    int type() const override;
 
     void startTime() override {}    //Decorations is not movable game items, so
     void stopTime() override  {}    //we do not have to do something here.

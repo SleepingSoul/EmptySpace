@@ -1,7 +1,6 @@
 #include "decoration.h"
 
 Decoration::Decoration(QPolygon poly)
-    : QGraphicsItem()
 {
     form = poly;
     _shape_path.addPolygon(poly);
@@ -16,6 +15,11 @@ Decoration::Decoration(QPolygon poly)
 Decoration::~Decoration()
 {
 
+}
+
+int Decoration::type() const
+{
+    return +ImpassableType;
 }
 
 void Decoration::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

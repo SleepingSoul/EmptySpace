@@ -24,7 +24,7 @@ public:
     void setView(QGraphicsView *);
 
 signals:
-    void signalTargetCoordinate(QPointF);
+    void signalTargetCoordinate();
     void signalShot            (bool);
     void signalButtons         (QSet <Qt::Key> &);
 
@@ -38,7 +38,6 @@ private /*functions*/:
     void mousePressEvent  (QGraphicsSceneMouseEvent *) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     void drawBackground   (QPainter *, const QRectF &) override;     //function that draws BG;
-    void targetCoordinate (QPointF);                                 //To set hero angle straight to cursor;
 
 private /*objects*/:
     Hero *phero;

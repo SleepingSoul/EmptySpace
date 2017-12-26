@@ -6,7 +6,7 @@
 
 class QPushButton;
 
-class QuitWindow : public QGraphicsItem, public GameplayItem
+class QuitWindow : public GameplayItem
 {
 public:
     QuitWindow();

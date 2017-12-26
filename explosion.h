@@ -2,7 +2,6 @@
 #define EXPLOSION_H
 
 #include <QObject>
-#include <QGraphicsItem>
 #include "gameplayitem.h"
 
 class QTimer;
@@ -14,7 +13,7 @@ class QPainter;
  * QGraphicsItem: for placing on the scene;
  * GameplayItem: to eneble/disable timers */
 
-class Explosion : public QObject, public QGraphicsItem, public GameplayItem
+class Explosion : public QObject, public GameplayItem
 {
     Q_OBJECT
 public:

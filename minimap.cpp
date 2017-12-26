@@ -28,7 +28,8 @@ void MiniMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
 QPointF MiniMap::mapToMinimap(const QPointF point)
 {
-    return {20.833 + (point.x() * 250. / 10000.) / 250. * 208.333, 20.833 + (point.y() * 250. / 10000.) / 250. * 208.333};
+    return {20.833 + (point.x() * 250. / 10000.) / 250. * 208.333,
+            20.833 + (point.y() * 250. / 10000.) / 250. * 208.333};
 }
 
 void MiniMap::setHeroPos(QPointF new_pos)

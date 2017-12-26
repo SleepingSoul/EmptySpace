@@ -2,8 +2,7 @@
 #define GUN_H
 
 #include <QObject>
-#include <QGraphicsItem>
-#include "gameplayitem.h"
+#include "gameplaymovableitem.h"
 
 class QTimer;
 class QPixmap;
@@ -16,21 +15,19 @@ class QMediaPlaylist;
  * QGraphicsItem: for placing on the scene;
  * GameplayItem: to eneble/disable timers */
 
-class Gun : public QObject, public QGraphicsItem, public GameplayItem
+class Gun : public QObject, public GameplayItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 public:
-    explicit Gun(QObject *parent = 0);\
+    explicit Gun(GameplayMovableItem *, QObject *parent = 0);\
     ~Gun();
     void shoot(const bool);
 
     void stopTime() override;
     void startTime() override;
+    bool isShooting() const;
 
-public slots:
-    void slotTarget(QPointF);
-    void setTarget(const QPointF);
+    void updateTarget();
 
 private /*objects*/:
     QTimer *timer;
@@ -41,7 +38,10 @@ private /*objects*/:
     FlameStream *fs;
     QMediaPlayer *player;
     QMediaPlaylist *playlist;
-    int     shot_interval {220};
+    GameplayMovableItem *hero;
+    bool    is_shooting {false};
+    int     shot_interval {440};
+    bool    is_paused {false};
 
 private /*functions*/:
     QRectF boundingRect() const override;

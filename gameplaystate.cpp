@@ -21,6 +21,10 @@
 #include <QStyle>
 #include "templates.h"
 #include "hpline.h"
+#include "gameinfoevent.h"
+#include "gameeventofappearing.h"
+#include "infowindow.h"
+#include "enemy.h"
 
 #define CHANGE_T_MS 250
 
@@ -42,8 +46,9 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
      coords*/
     pgraphics_view->setViewportUpdateMode       (QGraphicsView::NoViewportUpdate);
     pgraphics_view->setScene                    (pgraphics_scene);
-    pgraphics_view->setSceneRect                (500 - wwidth / 2., 500 - wheight / 2., wwidth - 2, wheight - 150);
+    pgraphics_view->setSceneRect                (500 - wwidth / 2., 500 - wheight / 2., wwidth - 2, wheight - 100);
     pgraphics_scene->setSceneRect               (0, 0, 10000, 10000);
+    pgraphics_view->setFixedSize                (wwidth - 2, wheight - 100);
     pgraphics_view->setMouseTracking            (true);
     pgraphics_view->setCursor(QCursor(QPixmap("game_cursor.png")));
 
@@ -55,8 +60,8 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     pgraphics_scene->addItem (phero);
     pgraphics_scene->setHero (phero);
 
-    connect(pgraphics_scene, SIGNAL(signalTargetCoordinate(QPointF)),
-            phero,           SLOT  (slotTarget(QPointF)));
+    connect(pgraphics_scene, SIGNAL(signalTargetCoordinate()),
+            phero,           SLOT  (slotTarget()));
     connect(pgraphics_scene, SIGNAL(signalShot(bool)),
             phero,           SLOT  (slotShot(bool)));
     connect(pgraphics_scene, SIGNAL(signalButtons(QSet <Qt::Key>&)),
@@ -106,6 +111,28 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     connect(change_time_timer, SIGNAL(timeout()), SLOT(slotUpdateTime()));
     change_time_timer->start(1000);
 
+//    Event set up
+    Enemy::setHero(phero);
+
+    GameEvent *event = new GameInfoEvent(this);
+    event->setCausePoint({1500, 1000});
+    InfoWindow *i_window = new InfoWindow(700, 400);
+    i_window->setInfoText("Welcome, commander. You are a pilot of spaceship. In this game your point is to"
+                          " kill all enemies you are going to meet with on the way to down right point of"
+                          " your map.\n Control this spaceship with buttons \n W, A, S, D\n and mouse to "
+                          "shoot. Good luck and have fun, comander!");
+    dynamic_cast <GameInfoEvent *>(event)->setInfoWindow(i_window);
+    events.push_back(event);
+
+    GameEventOfAppearing *enemy_appearing_event = new GameEventOfAppearing;
+    enemy_appearing_event->setCausePoint({3000, 1000});
+
+    Enemy *enemy = new Enemy();
+    enemy->setPos(3000, 800);
+
+    enemy_appearing_event->setAppearingItem(enemy);
+
+    events.push_back(enemy_appearing_event);
 
     /*Set up state widget*/
     state_widget = new QWidget;
@@ -117,6 +144,10 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     palette.setBrush(QPalette::Background, brush);
     state_widget->setAutoFillBackground(true);
     state_widget->setPalette(palette);
+
+    /*event activation*/
+    slotButtonPauseClicked();
+    events.at(0)->executeEvent(pgraphics_scene);
 }
 
 GameplayState::~GameplayState()
@@ -222,6 +253,7 @@ void GameplayState::slotDontQuit()
 
 void GameplayState::slotButtonPauseClicked()
 {
+    qDebug() << "helllo word";
     if (paused) {
         pgraphics_view->setFocus();
         btn_pause->setIcon(QIcon(QPixmap("btnPause.png")));
@@ -234,6 +266,7 @@ void GameplayState::slotButtonPauseClicked()
         btn_pause->setIcon(QIcon(QPixmap("btnPlay.png")));
         paused = true;
         foreach (auto item, pgraphics_scene->items()) {
+            qDebug() << "helllo word";
             dynamic_cast <GameplayItem *>(item)->stopTime();
         }
     }
@@ -241,10 +274,26 @@ void GameplayState::slotButtonPauseClicked()
 
 void GameplayState::slotUpdateTime()
 {
-    static bool flag(false);
     auto str = QDateTime::currentDateTime().time().toString();
     QString hours(str.left(2));
     QString mins(str.mid(3, 2));
-    lbl_time->setText(hours + " " + (flag? ":" : " ") + " " + mins);
-    flag = !flag;
+    lbl_time->setText(hours + " : " + mins);
+
+    executeEvents();
+}
+
+void GameplayState::executeEvents()
+{
+    qDebug() << events.size();
+    foreach (auto event, events) {
+        if (!event->executed() && event->cause(pgraphics_view)) {
+            if (event->getEventType() == GameEvent::EventType::InfoEvent && !paused)
+                slotButtonPauseClicked();
+            event->executeEvent(pgraphics_scene);
+        }
+    }
+    for (auto it = events.begin(); it != events.end(); ++it) {
+        if ((*it)->executed())
+            events.erase(it);
+    }
 }

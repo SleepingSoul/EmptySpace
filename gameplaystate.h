@@ -18,6 +18,7 @@ class GameView;
 class QDateTime;
 class QLabel;
 class HpLine;
+class GameEvent;
 
 class GameplayState : public State
 {
@@ -60,6 +61,9 @@ private /*objects*/:
     /*Main state widget*/
     QWidget              *state_widget;
 
+    /*Game events*/
+    QList <GameEvent *> events;
+
     /*Widget size constants*/
     const int            wwidth;
     const int            wheight;
@@ -69,7 +73,7 @@ private /*objects*/:
 
 private /*functions*/:
     void quitHandler();
-    //void setUpButton(QPushButton *, const char *);
+    void executeEvents();
 
 private slots:
     void slotButtonToMenuClicked();

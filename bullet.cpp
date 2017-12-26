@@ -6,10 +6,10 @@
 #include <QGraphicsScene>
 #include "explosion.h"
 
-Bullet::Bullet(const int d, QPixmap *bullet_pic, QObject *parent)
+Bullet::Bullet(const int d, QPixmap *bullet_pic, GameplayMovableItem *s, QObject *parent)
     : QObject(parent),
-      QGraphicsItem(),
-      bulletPic(bullet_pic)
+      bulletPic(bullet_pic),
+      sender(s)
 {
     ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotTimerBullet()));
@@ -45,16 +45,16 @@ void Bullet::slotTimerBullet()
 {
     this->setPos(mapToParent(0, -7));
 
-    QList<QGraphicsItem *> foundItems = scene()->items(QPolygonF()
-                                                       << mapToScene(0, 0)
-                                                       << mapToScene(-1, -1)
-                                                       << mapToScene(1, -1));
-    foreach (QGraphicsItem *item, foundItems) {
-        /*Check items. If item is bullet or explosion,
-         * then not explode. Otherwise make explosion.*/
-        if (item == this || item->type() == (UserType + 1))
-            continue;
-
+    if (this->collidesWithImpassableItem()) {
+        Explosion *exp = new Explosion;
+        exp->setPos(this->pos());
+        scene()->addItem(exp);
+        this->deleteLater();
+    }
+    else if (this->collidesWithDamagebleItem() &&
+             !(this->collidesWithDamagebleItem()->isHeroType() && sender->isHeroType()))
+    {
+        this->collidesWithDamagebleItem()->getDamage(this->damage);
         Explosion *exp = new Explosion;
         exp->setPos(this->pos());
         scene()->addItem(exp);
@@ -62,7 +62,7 @@ void Bullet::slotTimerBullet()
     }
 
     /*Check out of scene bullets*/
-    if (!scene()->sceneRect().contains(this->pos()))
+    if (!this->isInView())
         this->deleteLater();
 }
 

@@ -14,7 +14,7 @@
 #include "project_math.h"
 
 Hero::Hero(QObject *parent)
-    : QObject(parent), QGraphicsItem()
+    : QObject(parent)
 {
     hero_pic = new QPixmap("spaceship.png");
     ptimer = new QTimer(this);
@@ -56,22 +56,14 @@ void Hero::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
 void Hero::slotHeroTimer()
 {
-    static bool activated(false);
 
     if (!keys.empty()) {
         left_th->setMoving(true);
         right_th->setMoving(true);
-        activated = true;
     }
     else {
         left_th->setMoving(false);
         right_th->setMoving(false);
-        if (activated) {
-//            moveSystem({0, -1});
-//            if (scene()->collidingItems(this).size() != 2) {
-//                moveSystem({0, 1});
-//            }
-        }
     }
 
     /*Current scene rect*/
@@ -84,29 +76,26 @@ void Hero::slotHeroTimer()
     /*We move spaceship depends of current key set*/
     if (keys.contains(Qt::Key_W)) {
         moveSystem({0, -3});
-        qDebug() << scene()->collidingItems(this).size();
-        if (scene()->collidingItems(this).size() == 4) {
-            qDebug() << "FKING TRUE!";
+        if (!this->collidesWithImpassableItem())
+        {
             view->setSceneRect(cur_rect.translated(3*qSin(qDegreesToRadians(angle)),
                                                    -3*qCos(qDegreesToRadians(angle))));
         }
-        if (scene()->collidingItems(this).size() != 4) {
+        else
             moveSystem({0, 3});
-        }
     }
     if (keys.contains(Qt::Key_S)) {
         moveSystem({0, 3});
-        if (scene()->collidingItems(this).size() == 4)
+        if (!this->collidesWithImpassableItem())
             view->setSceneRect(cur_rect.translated(-3*qSin(qDegreesToRadians(angle)),
                                                    3*qCos(qDegreesToRadians(angle))));
-        if (scene()->collidingItems(this).size() != 4) {
+        else
             moveSystem({0, -3});
-        }
     }
     if (keys.contains(Qt::Key_A)) {
         this->setRotation(this->rotation() - 1);
         updateThrustsPos();
-        if (scene()->collidingItems(this).size() != 4) {
+        if (this->collidesWithImpassableItem()) {
             this->setRotation(this->rotation() + 1);
             updateThrustsPos();
         }
@@ -114,7 +103,7 @@ void Hero::slotHeroTimer()
     if (keys.contains(Qt::Key_D)) {
         this->setRotation(this->rotation() + 1);
         updateThrustsPos();
-        if (scene()->collidingItems(this).size() != 4) {
+        if (this->collidesWithImpassableItem()) {
             this->setRotation(this->rotation() - 1);
             updateThrustsPos();
         }
@@ -122,37 +111,6 @@ void Hero::slotHeroTimer()
 
     /*We always move Gun with our spaceship*/
     pgun->setPos(mapToScene(0, 40));
-
-//    /*Current scene rect*/
-//    auto cur_rect = scene()->views().front()->sceneRect();
-//    /*Currect view ptr*/
-//    auto view = scene()->views().front();
-//    /*Current hero angle*/
-//    qreal angle = normalizeDegrees(this->rotation());
-
-//    /*Very complicated alghorithm of camera (view) moving*/
-//    if (keys.contains(Qt::Key_S)) {
-//        if ((x() < cur_rect.x() + 600                     && !(angle <= 360 && angle >= 180)) ||
-//            (x() > cur_rect.x() + cur_rect.width() - 600  && !(angle >= 0 && angle <= 180))  ||
-//            (y() < cur_rect.y() + 400                     && !(angle >= 270 && angle <= 360 ||
-//                                                               angle >= 0 && angle <= 90)) ||
-//            (y() > cur_rect.y() + cur_rect.height() - 400 && !(angle >= 90 && angle <= 270)))
-//        {
-//            view->setSceneRect(cur_rect.translated(-3*qSin(qDegreesToRadians(angle)),
-//                                                   3*qCos(qDegreesToRadians(angle))));
-//        }
-//    }
-//    else {
-//        if ((x() < cur_rect.x() + 600                     && angle <= 360 && angle >= 180) ||
-//            (x() > cur_rect.x() + cur_rect.width() - 600  && angle >= 0 && angle <= 180)  ||
-//            (y() < cur_rect.y() + 400                     && (angle >= 270 && angle <= 360 ||
-//                                                             angle >= 0 && angle <= 90)) ||
-//            (y() > cur_rect.y() + cur_rect.height() - 400 && (angle >= 90 && angle <= 270)))
-//        {
-//            view->setSceneRect(cur_rect.translated(3*qSin(qDegreesToRadians(angle)),
-//                                                   -3*qCos(qDegreesToRadians(angle))));
-//        }
-//    }
 }
 
 void Hero::moveSystem(const QPointF &point)
@@ -192,9 +150,9 @@ void Hero::updateThrustsPos()
     }
 }
 
-void Hero::slotTarget(QPointF point)
+void Hero::slotTarget()
 {
-    pgun->setTarget(point);
+    pgun->updateTarget();
 }
 
 QVariant Hero::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -204,8 +162,9 @@ QVariant Hero::itemChange(GraphicsItemChange change, const QVariant &value)
          * Allocating memory for children, adding
          * them on this scene*/
 
-        pgun = new Gun;
+        pgun = new Gun(this);
         pgun->setZValue(3);
+        pgun->setPos(mapToScene(0, 40));
         value.value <QGraphicsScene *>()->addItem(pgun);
 
         value.value <QGraphicsScene *>()->addItem(left_th);
@@ -239,4 +198,14 @@ void Hero::startTime()
 {
     keys.clear();
     ptimer->start(18);
+}
+
+void Hero::getDamage(const int damage)
+{
+
+}
+
+int Hero::type() const
+{
+    return Type;
 }

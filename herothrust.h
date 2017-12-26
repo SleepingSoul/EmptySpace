@@ -8,20 +8,13 @@
 class QTimer;
 class QPixmap;
 
-class HeroThrust : public QObject, public QGraphicsItem, public GameplayItem
+class HeroThrust : public QObject, public GameplayItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
-    enum {Type = UserType + 1};
-
     explicit HeroThrust(QObject *parent = 0);
     ~HeroThrust();
-
-    int type() const
-    {
-        return Type;
-    }
 
     void stopTime() override;
     void startTime() override;

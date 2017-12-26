@@ -2,22 +2,20 @@
 #define BULLET_H
 
 #include <QObject>
-#include <QGraphicsItem>
-#include "gameplayitem.h"
+#include "gameplaymovableitem.h"
 
 /*Parent classes:
  * QObject: for signals/slots;
  * QGraphicsItem: for placing on the scene;
  * GameplayItem: to eneble/disable timers */
 
-class Bullet : public QObject, public QGraphicsItem, public GameplayItem
+class Bullet : public QObject, public GameplayMovableItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 public:
     enum {Type = UserType + 1};
 
-    explicit Bullet(const int, QPixmap *, QObject * = 0);
+    explicit Bullet(const int, QPixmap *, GameplayMovableItem * = nullptr, QObject * = 0);
     ~Bullet();
 
     int Damage     () const;
@@ -29,6 +27,8 @@ public:
     void stopTime () override;
     void startTime() override;
 
+    void getDamage(const int) override {}
+
 private /*functions*/:
     QRectF boundingRect() const override;
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
@@ -38,6 +38,7 @@ private /*functions*/:
 private /*objects*/:
     QTimer    *ptimer;
     QPixmap   *bulletPic;
+    GameplayMovableItem *sender;
     const int damage {25};
 
     /*All bullets if flying with same speed (maybe, no?)*/

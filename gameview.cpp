@@ -11,13 +11,3 @@ GameView::~GameView()
 {
 
 }
-
-void GameView::focusInEvent(QFocusEvent *event)
-{
-    QGraphicsView::focusInEvent(event);
-}
-
-void GameView::focusOutEvent(QFocusEvent *event)
-{
-    QGraphicsView::focusOutEvent(event);
-}

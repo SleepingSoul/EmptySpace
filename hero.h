@@ -2,35 +2,32 @@
 #define HERO_H
 
 #include <QObject>
-#include <QGraphicsItem>
 #include <QSet>
-#include "gameplayitem.h"
+#include "gameplaymovableitem.h"
 
 class QTimer;
 class Gun;
 class HeroThrust;
 
-/*Parent classes:
- * QObject: for signals/slots;
- * QGraphicsItem: for placing on the scene;
- * GameplayItem: to eneble/disable timers */
-
-class Hero : public QObject, public QGraphicsItem, public GameplayItem
+class Hero : public QObject, public GameplayMovableItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 public:
+    enum {Type = UserType + 4}; /*hero type*/
+
     explicit Hero(QObject *parent = 0);
     ~Hero();
 
     void stopTime() override;
     void startTime() override;
+    void getDamage(const int) override;
+    int type() const override;
 
 signals:
     void moveBackground(qreal);
 
 public slots:
-    void slotTarget(QPointF);
+    void slotTarget();
     void slotShot  (bool);
 
 private slots:

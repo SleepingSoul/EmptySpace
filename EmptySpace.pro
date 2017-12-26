@@ -47,7 +47,12 @@ SOURCES += main.cpp\
     state.cpp \
     customtextitem.cpp \
     hpline.cpp \
-    minimap.cpp
+    minimap.cpp \
+    gameplaymovableitem.cpp \
+    gameeventofappearing.cpp \
+    gameinfoevent.cpp \
+    infowindow.cpp \
+    enemy.cpp
 
 HEADERS  += \
     myapplication.h \
@@ -78,7 +83,13 @@ HEADERS  += \
     templates.h \
     customtextitem.h \
     hpline.h \
-    minimap.h
+    minimap.h \
+    gameplaymovableitem.h \
+    gameevent.h \
+    gameeventofappearing.h \
+    gameinfoevent.h \
+    infowindow.h \
+    enemy.h
 
 FORMS    += widget.ui
 
