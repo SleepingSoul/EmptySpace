@@ -74,6 +74,7 @@ private /*objects*/:
 private /*functions*/:
     void quitHandler();
     void executeEvents();
+    void makeEvents();
 
 private slots:
     void slotButtonToMenuClicked();

@@ -6,14 +6,16 @@
 #include <QGraphicsScene>
 #include "explosion.h"
 
-Bullet::Bullet(const int d, QPixmap *bullet_pic, GameplayMovableItem *s, QObject *parent)
+Bullet::Bullet(const int d, const int sm, QPixmap *bullet_pic, GameplayMovableItem *s, QObject *parent)
     : QObject(parent),
       bulletPic(bullet_pic),
-      sender(s)
+      sender(s),
+      damage(d),
+      single_move(sm)
 {
     ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotTimerBullet()));
-    Q_UNUSED(d); //yet
+    has_hero_sender = s->isHeroType();
 }
 
 Bullet::~Bullet()
@@ -43,26 +45,31 @@ QPainterPath Bullet::shape() const
 
 void Bullet::slotTimerBullet()
 {
-    this->setPos(mapToParent(0, -7));
+    bool should_be_destroyed{false};
+
+    this->setPos(mapToParent(0, -single_move));
 
     if (this->collidesWithImpassableItem()) {
         Explosion *exp = new Explosion;
         exp->setPos(this->pos());
         scene()->addItem(exp);
-        this->deleteLater();
+        should_be_destroyed = true;
     }
     else if (this->collidesWithDamagebleItem() &&
-             !(this->collidesWithDamagebleItem()->isHeroType() && sender->isHeroType()))
+             !(this->collidesWithDamagebleItem()->isHeroType() && has_hero_sender))
     {
         this->collidesWithDamagebleItem()->getDamage(this->damage);
         Explosion *exp = new Explosion;
         exp->setPos(this->pos());
         scene()->addItem(exp);
-        this->deleteLater();
+        should_be_destroyed = true;
     }
 
     /*Check out of scene bullets*/
     if (!this->isInView())
+        should_be_destroyed = true;
+
+    if (should_be_destroyed)
         this->deleteLater();
 }
 
@@ -81,7 +88,7 @@ QVariant Bullet::itemChange(GraphicsItemChange change, const QVariant &value)
 
 int Bullet::type() const
 {
-    return Type;
+    return SimpleType;
 }
 
 void Bullet::stopTime()

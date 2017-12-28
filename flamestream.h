@@ -18,7 +18,10 @@ public:
     void shootCall(const bool);
 
 private /*objects*/:
-    QPixmap *sprite;
+    /*Current's weapon features*/
+    QPixmap *blaster_sprite;
+    QPixmap *plasma_sprite;
+
     bool shooting {false};
     QTimer *timer;
     int current_frame {0};

@@ -11,6 +11,7 @@ public:
     void startTime() override = 0;
     bool collidesWithImpassableItem() const;
     GameplayMovableItem *collidesWithDamagebleItem() const;
+    GameplayItem *collidesWithBonusItem() const;
     bool isHeroType() const;
     bool isInView() const;
 };

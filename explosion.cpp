@@ -39,11 +39,6 @@ void Explosion::nextFrame()
         this->deleteLater();    // Если кадры закончились, то удаляем объект взрыва
 }
 
-int Explosion::type() const
-{
-    return Type;
-}
-
 void Explosion::stopTime()
 {
     timer->stop();
@@ -52,4 +47,9 @@ void Explosion::stopTime()
 void Explosion::startTime()
 {
     timer->start(18);
+}
+
+int Explosion::type() const
+{
+    return SimpleType;
 }

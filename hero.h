@@ -8,13 +8,13 @@
 class QTimer;
 class Gun;
 class HeroThrust;
+class QMediaPlayer;
+class Shield;
 
 class Hero : public QObject, public GameplayMovableItem
 {
     Q_OBJECT
 public:
-    enum {Type = UserType + 4}; /*hero type*/
-
     explicit Hero(QObject *parent = 0);
     ~Hero();
 
@@ -23,8 +23,14 @@ public:
     void getDamage(const int) override;
     int type() const override;
 
+    void changeWeapon();
+    void charge();
+    void activateShield();
+
 signals:
     void moveBackground(qreal);
+    void signalHpChanged(int);
+    void signalCharged();
 
 public slots:
     void slotTarget();
@@ -33,6 +39,9 @@ public slots:
 private slots:
     void slotHeroTimer();
     void slotButtons  (QSet <Qt::Key> &);
+    void slotChargeEnded();
+    void slotCharged();
+    void slotShieldExpired();
 
 private /*functions*/:
     QRectF boundingRect()                                                  const override;
@@ -44,15 +53,24 @@ private /*functions*/:
     void updateThrustsPos();
 
 private /*objects*/:
+    QMediaPlayer   *player;
     QPixmap        *hero_pic;
     QTimer         *ptimer;
-    QTimer         *pshoting_timer;
+    QTimer         *charge_timer;
     QPointF        target;
     Gun            *pgun;
+    Shield         *shield {nullptr};
     QSet <Qt::Key> keys;
     HeroThrust     *left_th;
     HeroThrust     *right_th;
     const int      STEP {4};
+    int hp         {1000};
+    int step {3};
+    int default_step {3};
+    int charged_step {8};
+    bool can_charge {true};
+    bool can_activate_shield {true};
+    bool has_shield {false};
 };
 
 #endif // HERO_H

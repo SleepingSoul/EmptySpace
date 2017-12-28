@@ -12,6 +12,7 @@ class GameplayItem : public QGraphicsItem
 {
     Q_INTERFACES(QGraphicsItem)
 public:
+    enum ItemType{SimpleType = UserType + 1, ImpassableType, DamagebleType, HeroType, HealingType};
     virtual void  stopTime() = 0;
     virtual void startTime() = 0;
 };

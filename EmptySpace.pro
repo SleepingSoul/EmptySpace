@@ -52,7 +52,14 @@ SOURCES += main.cpp\
     gameeventofappearing.cpp \
     gameinfoevent.cpp \
     infowindow.cpp \
-    enemy.cpp
+    enemy.cpp \
+    healingitem.cpp \
+    weapon.cpp \
+    charger.cpp \
+    heavyenemy.cpp \
+    shield.cpp \
+    shieldswindow.cpp \
+    characterexplosion.cpp
 
 HEADERS  += \
     myapplication.h \
@@ -89,7 +96,15 @@ HEADERS  += \
     gameeventofappearing.h \
     gameinfoevent.h \
     infowindow.h \
-    enemy.h
+    enemy.h \
+    healingitem.h \
+    weapon.h \
+    global_enumerations.h \
+    charger.h \
+    heavyenemy.h \
+    shield.h \
+    shieldswindow.h \
+    characterexplosion.h
 
 FORMS    += widget.ui
 

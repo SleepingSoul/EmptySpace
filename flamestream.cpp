@@ -6,14 +6,14 @@
 FlameStream::FlameStream(QObject *parent)
     : QObject(parent)
 {
-    sprite = new QPixmap("shooting_sp.png");
+    blaster_sprite = new QPixmap("shooting_sp.png");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotFrame()));
 }
 
 FlameStream::~FlameStream()
 {
-    delete sprite;
+    delete blaster_sprite;
 }
 
 void FlameStream::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -22,28 +22,28 @@ void FlameStream::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
         return;
     else {
         if (current_frame == 0) {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(0, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(0, 0, 30, 60));
         }
         else if (current_frame == 1) {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(30, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(30, 0, 30, 60));
         }
         else if (current_frame == 2){
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(60, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(60, 0, 30, 60));
         }
         else if (current_frame == 3) {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(90, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(90, 0, 30, 60));
         }
         else if (current_frame == 4) {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(120, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(120, 0, 30, 60));
         }
         else if (current_frame == 5) {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(150, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(150, 0, 30, 60));
         }
         else if (current_frame == 6) {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(180, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(180, 0, 30, 60));
         }
         else {
-            painter->drawPixmap(-20, -30, 40, 60, sprite->copy(210, 0, 30, 60));
+            painter->drawPixmap(-20, -30, 40, 60, blaster_sprite->copy(210, 0, 30, 60));
         }
     }
 }

@@ -10,6 +10,8 @@ class Decoration;
 class Hero;
 class HpLine;
 class MiniMap;
+class Weapon;
+class Charger;
 class QGraphicsView;
 
 class GameScene : public QGraphicsScene
@@ -48,8 +50,13 @@ private /*objects*/:
     QPolygon               footer_polygon;
     QTimer                 *fps_timer;
     QPointF                target;
+
+    /*Custom elements:*/
     HpLine                 *hp_line;
     MiniMap                *mini_map;
+    Weapon                 *weapon;
+    Charger                *charger;
+
     qreal                  hero_angle;
     QGraphicsView          *view;
     const int              wwidth;

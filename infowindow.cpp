@@ -29,7 +29,7 @@ void InfoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->drawPixmap(0, 0, width, height, *bg_image);
     painter->setPen(QPen(Qt::white));
     QFont font;
-    font.setPointSize(15);
+    font.setPointSize(12);
     font.setFamily("Lucida Console");
     painter->setFont(font);
     painter->drawText(QRectF(50, 50, width - 100, height - 200), info_str);

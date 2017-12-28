@@ -19,7 +19,7 @@ Decoration::~Decoration()
 
 int Decoration::type() const
 {
-    return +ImpassableType;
+    return ImpassableType;
 }
 
 void Decoration::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

@@ -20,21 +20,20 @@ public:
     explicit Explosion(QObject *parent = 0);
     ~Explosion();
 
-    enum {Type = UserType + 1};
-    int type() const;
+    int type() const override;
 
     /*Start/stop all timers*/
     void stopTime () override;
     void startTime() override;
 
-private slots:
-    void nextFrame();
+protected slots:
+    virtual void nextFrame();
 
-private /*functions*/:
+protected /*functions*/:
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
     QRectF boundingRect() const;
 
-private /*objects*/:
+protected /*objects*/:
     QTimer  *timer;
     QPixmap *spriteImage;
     int     currentFrame;

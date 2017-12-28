@@ -12,6 +12,8 @@
 #include "bullet.h"
 #include "direction.h"
 #include "project_math.h"
+#include <QMediaPlayer>
+#include "shield.h"
 
 Hero::Hero(QObject *parent)
     : QObject(parent)
@@ -20,10 +22,18 @@ Hero::Hero(QObject *parent)
     ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotHeroTimer()));
 
+    charge_timer = new QTimer(this);
+    connect(charge_timer, SIGNAL(timeout()), SLOT(slotChargeEnded()));
+
+    player = new QMediaPlayer(this);
+    player->setMedia(QMediaContent(QUrl::fromLocalFile("charging.wav")));
+
     left_th = new HeroThrust;
     right_th = new HeroThrust;
     left_th->setZValue(1);
     right_th->setZValue(1);
+
+    can_activate_shield = true;
 }
 
 Hero::~Hero()
@@ -75,22 +85,22 @@ void Hero::slotHeroTimer()
 
     /*We move spaceship depends of current key set*/
     if (keys.contains(Qt::Key_W)) {
-        moveSystem({0, -3});
+        moveSystem({0, -step});
         if (!this->collidesWithImpassableItem())
         {
-            view->setSceneRect(cur_rect.translated(3*qSin(qDegreesToRadians(angle)),
-                                                   -3*qCos(qDegreesToRadians(angle))));
+            view->setSceneRect(cur_rect.translated(step*qSin(qDegreesToRadians(angle)),
+                                                   -step*qCos(qDegreesToRadians(angle))));
         }
         else
-            moveSystem({0, 3});
+            moveSystem({0, step});
     }
     if (keys.contains(Qt::Key_S)) {
-        moveSystem({0, 3});
+        moveSystem({0, step});
         if (!this->collidesWithImpassableItem())
-            view->setSceneRect(cur_rect.translated(-3*qSin(qDegreesToRadians(angle)),
-                                                   3*qCos(qDegreesToRadians(angle))));
+            view->setSceneRect(cur_rect.translated(-step*qSin(qDegreesToRadians(angle)),
+                                                   step*qCos(qDegreesToRadians(angle))));
         else
-            moveSystem({0, -3});
+            moveSystem({0, -step});
     }
     if (keys.contains(Qt::Key_A)) {
         this->setRotation(this->rotation() - 1);
@@ -109,8 +119,23 @@ void Hero::slotHeroTimer()
         }
     }
 
+    auto bonus_item = this->collidesWithBonusItem();
+
+    if (bonus_item && bonus_item->type() == HealingType) {
+        qDebug() << "this is gonna be here";
+        scene()->removeItem(bonus_item);
+        delete bonus_item;
+        hp += 100;
+        if (hp > 1000)
+            hp = 1000;
+        emit signalHpChanged(hp);
+    }
+
     /*We always move Gun with our spaceship*/
     pgun->setPos(mapToScene(0, 40));
+
+    if (has_shield)
+        shield->setPos(this->pos());
 }
 
 void Hero::moveSystem(const QPointF &point)
@@ -202,10 +227,56 @@ void Hero::startTime()
 
 void Hero::getDamage(const int damage)
 {
-
+    hp -= damage;
+    emit signalHpChanged(hp);
 }
 
 int Hero::type() const
 {
-    return Type;
+    return HeroType;
+}
+
+void Hero::changeWeapon()
+{
+    pgun->changeWeapon();
+}
+
+void Hero::charge()
+{
+    if (can_charge) {
+        step = charged_step;
+        charge_timer->start(1500);
+        player->play();
+        can_charge = false;
+        emit signalCharged();
+    }
+}
+
+void Hero::slotChargeEnded()
+{
+    step = default_step;
+}
+
+void Hero::slotCharged()
+{
+    can_charge = true;
+}
+
+void Hero::activateShield()
+{
+    if (can_activate_shield) {
+        can_activate_shield = false;
+        shield = new Shield();
+        connect(shield, SIGNAL(signalShieldExpired()), SLOT(slotShieldExpired()));
+        shield->setPos(this->pos());
+        scene()->addItem(shield);
+        shield->activate();
+        has_shield = true;
+    }
+}
+
+void Hero::slotShieldExpired()
+{
+    delete shield;
+    has_shield = false;
 }

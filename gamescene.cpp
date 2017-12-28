@@ -15,6 +15,8 @@
 #include <QGraphicsProxyWidget>
 #include "hpline.h"
 #include "minimap.h"
+#include "weapon.h"
+#include "charger.h"
 
 GameScene::GameScene(const int w, const int h, QObject *parent)
     : QGraphicsScene(), wwidth(w), wheight(h)
@@ -29,9 +31,13 @@ GameScene::GameScene(const int w, const int h, QObject *parent)
 
     hp_line = new HpLine();
     mini_map = new MiniMap();
+    weapon = new Weapon();
+    charger = new Charger();
 
     this->addItem(hp_line);
     this->addItem(mini_map);
+    this->addItem(weapon);
+    this->addItem(charger);
 
     fps_timer = new QTimer(this);
     connect(fps_timer, SIGNAL(timeout()), SLOT(slotUpdateViewport()));
@@ -53,6 +59,8 @@ void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
     hp_line->setPos(rect.x() + rect.width() / 2. - 350, rect.y() + rect.height() - 30);
     mini_map->setHeroPos(phero->pos());
     mini_map->setPos(rect.x() + 10, rect.y() + rect.height() - 260);
+    weapon->setPos(rect.x() + rect.width() - 200, rect.y() + rect.height() - 250);
+    charger->setPos(rect.x() + 10, rect.y() + rect.height() - 460);
 }
 
 void GameScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -64,6 +72,9 @@ void GameScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void GameScene::setHero(Hero *h)
 {
     phero = h;
+    connect(phero, SIGNAL(signalHpChanged(int)), hp_line, SLOT(slotSetHeroHp(int)));
+    connect(charger, SIGNAL(signalCharged()), phero, SLOT(slotCharged()));
+    connect(phero, SIGNAL(signalCharged()), charger, SLOT(slotHeroCharged()));
 }
 
 void GameScene::readDecorations(const QString fileName)
@@ -124,13 +135,18 @@ void GameScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void GameScene::keyPressEvent(QKeyEvent *event)
 {
-    if ((static_cast <Qt::Key>(event->key()) == Qt::Key_W ||
-         static_cast <Qt::Key>(event->key()) == Qt::Key_A ||
-         static_cast <Qt::Key>(event->key()) == Qt::Key_S ||
-         static_cast <Qt::Key>(event->key()) == Qt::Key_D) &&
-         pr_keys.size() < 2)
-    {
-        pr_keys.insert(static_cast <Qt::Key>(event->key()));
+    pr_keys.insert(static_cast <Qt::Key>(event->key()));
+
+    if (static_cast <Qt::Key>(event->key()) == Qt::Key_E) {
+        weapon->changeWeapon();
+        phero->changeWeapon();
+    }
+    if (static_cast <Qt::Key>(event->key()) == Qt::Key_Shift) {
+        phero->charge();
+    }
+
+    if (static_cast <Qt::Key>(event->key()) == Qt::Key_Q) {
+        phero->activateShield();
     }
 
     emit signalButtons(pr_keys);

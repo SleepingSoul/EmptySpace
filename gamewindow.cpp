@@ -64,6 +64,7 @@ GameWindow::~GameWindow()
     delete menu_state;
     delete settings_state;
     delete about_state;
+
     delete music_player;
 }
 

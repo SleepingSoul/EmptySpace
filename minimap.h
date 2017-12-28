@@ -6,14 +6,12 @@
 class MiniMap : public GameplayItem
 {
 public:
-    enum {Type = UserType + 1};
-
     MiniMap();
     ~MiniMap();
 
     int type() const override
     {
-        return Type;
+        return SimpleType;
     }
 
     void stopTime() override {}

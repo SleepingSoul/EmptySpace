@@ -12,7 +12,6 @@
 class Decoration : public GameplayItem
 {
 public:
-    enum {ImpassableType = UserType + 2};
     explicit Decoration(QPolygon);
     ~Decoration();
     //void set_polygon(QPolygon);

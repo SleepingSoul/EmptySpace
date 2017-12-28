@@ -132,12 +132,11 @@ SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh)
 SettingsState::~SettingsState()
 {
     //delete bg;
+    writeSettings();
     delete lout;
     delete player;
     delete pstgs_scene;
     delete pgraphics_view;
-
-    writeSettings();
     qDebug() << "SS destr";
 }
 

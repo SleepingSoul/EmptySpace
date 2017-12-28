@@ -4,26 +4,25 @@
 #include "gameplaymovableitem.h"
 #include <QObject>
 
+class QMediaPlayer;
+class QMediaPlaylist;
+
 class Enemy : public QObject, public GameplayMovableItem
 {
     Q_OBJECT
 public:
-    enum {Type = UserType + 3}; //type of class that can take damage
     explicit Enemy(QObject * = 0);
     ~Enemy();
 
     void stopTime() override;
     void startTime() override;
-    int type() const
-    {
-        return Type;
-    }
+    int type() const override;
 
     void getDamage(const int) override;
 
     static void setHero(QGraphicsItem *);
 
-private:
+protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QRectF boundingRect() const override;
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -32,12 +31,15 @@ private:
     QPixmap *bullet_pic;
     QTimer *timer;
     QTimer *shooting_timer;
+    QMediaPlayer *player;
+    QMediaPlaylist *playlist;
     int hp {200};
+    int shot_interval;
     static QGraphicsItem *hero;
 
 private slots:
-    void slotTimer();
-    void slotShoot();
+    virtual void slotTimer();
+    virtual void slotShoot();
 };
 
 #endif // ENEMY_H

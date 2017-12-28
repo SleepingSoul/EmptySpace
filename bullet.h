@@ -13,9 +13,7 @@ class Bullet : public QObject, public GameplayMovableItem
 {
     Q_OBJECT
 public:
-    enum {Type = UserType + 1};
-
-    explicit Bullet(const int, QPixmap *, GameplayMovableItem * = nullptr, QObject * = 0);
+    explicit Bullet(const int, const int, QPixmap *, GameplayMovableItem * = nullptr, QObject * = 0);
     ~Bullet();
 
     int Damage     () const;
@@ -40,6 +38,8 @@ private /*objects*/:
     QPixmap   *bulletPic;
     GameplayMovableItem *sender;
     const int damage {25};
+    const int single_move {7};
+    bool has_hero_sender;
 
     /*All bullets if flying with same speed (maybe, no?)*/
     static const int _timerTemp_ms {15};

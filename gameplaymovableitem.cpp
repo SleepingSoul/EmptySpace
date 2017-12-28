@@ -5,7 +5,7 @@
 bool GameplayMovableItem::collidesWithImpassableItem() const
 {
     foreach (auto item, scene()->collidingItems(this)) {
-        if (item->type() == UserType + 2)   /*(UserType + 2) --- impassable item type*/
+        if (item->type() == ImpassableType)
             return true;
     }
     return false;
@@ -14,16 +14,24 @@ bool GameplayMovableItem::collidesWithImpassableItem() const
 GameplayMovableItem *GameplayMovableItem::collidesWithDamagebleItem() const
 {
     foreach (auto item, scene()->collidingItems(this)) {
-        if (item->type() == UserType + 3 || item->type() == UserType + 4)
-            /*(UserType + 3) --- damageble item type*/
+        if (item->type() == DamagebleType || item->type() == HeroType)
             return dynamic_cast <GameplayMovableItem *>(item);
+    }
+    return nullptr;
+}
+
+GameplayItem *GameplayMovableItem::collidesWithBonusItem() const
+{
+    foreach (auto item, scene()->collidingItems(this)) {
+        if (item->type() == HealingType)
+            return dynamic_cast <GameplayItem *>(item);
     }
     return nullptr;
 }
 
 bool GameplayMovableItem::isHeroType() const
 {
-    return this->type() == UserType + 4;    /*hero type (also damageble type)*/
+    return this->type() == HeroType;    /*hero type (also damageble type)*/
 }
 
 bool GameplayMovableItem::isInView() const

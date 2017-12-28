@@ -24,9 +24,13 @@
 #include "gameinfoevent.h"
 #include "gameeventofappearing.h"
 #include "infowindow.h"
-#include "enemy.h"
+//#include "enemy.h"
+#include "heavyenemy.h"
 
 #define CHANGE_T_MS 250
+
+/*TODO add alternative weapon, add alternative enemy, add charge, add other bonus except of healing*/
+/*TODO find cause of exception*/
 
 GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     : wwidth(ww), wheight(wh), game_window(gwd)
@@ -111,28 +115,9 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     connect(change_time_timer, SIGNAL(timeout()), SLOT(slotUpdateTime()));
     change_time_timer->start(1000);
 
-//    Event set up
+    /*Events set up*/
     Enemy::setHero(phero);
-
-    GameEvent *event = new GameInfoEvent(this);
-    event->setCausePoint({1500, 1000});
-    InfoWindow *i_window = new InfoWindow(700, 400);
-    i_window->setInfoText("Welcome, commander. You are a pilot of spaceship. In this game your point is to"
-                          " kill all enemies you are going to meet with on the way to down right point of"
-                          " your map.\n Control this spaceship with buttons \n W, A, S, D\n and mouse to "
-                          "shoot. Good luck and have fun, comander!");
-    dynamic_cast <GameInfoEvent *>(event)->setInfoWindow(i_window);
-    events.push_back(event);
-
-    GameEventOfAppearing *enemy_appearing_event = new GameEventOfAppearing;
-    enemy_appearing_event->setCausePoint({3000, 1000});
-
-    Enemy *enemy = new Enemy();
-    enemy->setPos(3000, 800);
-
-    enemy_appearing_event->setAppearingItem(enemy);
-
-    events.push_back(enemy_appearing_event);
+    makeEvents();
 
     /*Set up state widget*/
     state_widget = new QWidget;
@@ -284,11 +269,12 @@ void GameplayState::slotUpdateTime()
 
 void GameplayState::executeEvents()
 {
-    qDebug() << events.size();
+    qDebug() << "events size: " << events.size();
     foreach (auto event, events) {
         if (!event->executed() && event->cause(pgraphics_view)) {
-            if (event->getEventType() == GameEvent::EventType::InfoEvent && !paused)
+            if (event->getEventType() == GameEvent::EventType::InfoEvent && !paused) {
                 slotButtonPauseClicked();
+            }
             event->executeEvent(pgraphics_scene);
         }
     }
@@ -296,4 +282,114 @@ void GameplayState::executeEvents()
         if ((*it)->executed())
             events.erase(it);
     }
+}
+
+void GameplayState::makeEvents()
+{
+    /*Gameplay events take place in this function*/
+
+    GameInfoEvent *first_info_event = new GameInfoEvent(this);
+    first_info_event->setCausePoint({1500, 1000});
+    InfoWindow *i_window = new InfoWindow(700, 400);
+    i_window->setInfoText("Welcome, commander. You are a pilot of spaceship.\n "
+                          "Control it with buttons \n W, A, S, D\n and mouse to "
+                          "shoot. Sometimes i will help you to learn something new.\n "
+                          "Good luck and have fun, comander!");
+    first_info_event->setInfoWindow(i_window);
+    events.push_back(first_info_event);
+
+    GameEventOfAppearing *enemy_1_apr = new GameEventOfAppearing;
+    GameEventOfAppearing *enemy_2_apr = new GameEventOfAppearing;
+    enemy_1_apr->setCausePoint({2050, 600});
+    enemy_2_apr->setCausePoint({2050, 600});
+
+    Enemy *enemy_1 = new Enemy();
+    Enemy *enemy_2 = new Enemy();
+    enemy_1->setPos(2000, 400);
+    enemy_2->setPos(2000, 800);
+
+    enemy_1_apr->setAppearingItem(enemy_1);
+    enemy_2_apr->setAppearingItem(enemy_2);
+
+    events.push_back(enemy_1_apr);
+    events.push_back(enemy_2_apr);
+
+    GameInfoEvent *first_enemies_event = new GameInfoEvent(this);
+    first_enemies_event->setCausePoint({2055, 600});
+    InfoWindow *i2_window = new InfoWindow(600, 400);
+    i2_window->setInfoText("It looks like you have just met your first enemies. Be carefull!\n"
+                           "Try to use clever tactic and not to take damage");
+    first_enemies_event->setInfoWindow(i2_window);
+    events.push_back(first_enemies_event);
+
+    GameInfoEvent *heal_event = new GameInfoEvent(this);
+    heal_event->setCausePoint({2500, 600});
+    InfoWindow *he_window = new InfoWindow(600, 400);
+    he_window->setInfoText("After enemy die - you can collect some bonuses which had been "
+                           "left by enemies on the space. Fox example, you can charge your "
+                           "HP with this healing items!");
+    heal_event->setInfoWindow(he_window);
+    events.push_back(heal_event);
+
+    GameEventOfAppearing *enemy_3_apr = new GameEventOfAppearing;
+    GameEventOfAppearing *enemy_4_apr = new GameEventOfAppearing;
+    GameEventOfAppearing *enemy_5_apr = new GameEventOfAppearing;
+    GameEventOfAppearing *enemy_6_apr = new GameEventOfAppearing;
+    enemy_3_apr->setCausePoint({4000, 600});
+    enemy_4_apr->setCausePoint({4250, 600});
+    enemy_5_apr->setCausePoint({4600, 600});
+    enemy_6_apr->setCausePoint({4900, 600});
+
+    Enemy *enemy_3 = new Enemy();
+    Enemy *enemy_4 = new Enemy();
+    Enemy *enemy_5 = new Enemy();
+    Enemy *enemy_6 = new Enemy();
+
+    enemy_3->setPos(4000, 500);
+    enemy_4->setPos(4100, 800);
+    enemy_5->setPos(3900, 600);
+    enemy_6->setPos(4000, 1000);
+
+    enemy_3_apr->setAppearingItem(enemy_3);
+    enemy_4_apr->setAppearingItem(enemy_4);
+    enemy_5_apr->setAppearingItem(enemy_5);
+    enemy_6_apr->setAppearingItem(enemy_6);
+
+    events.push_back(enemy_3_apr);
+    events.push_back(enemy_4_apr);
+    events.push_back(enemy_5_apr);
+    events.push_back(enemy_6_apr);
+
+    GameInfoEvent *boss_is_near_event = new GameInfoEvent(this);
+    boss_is_near_event->setCausePoint({5500, 600});
+    InfoWindow *bin_window = new InfoWindow(600, 400);
+    bin_window->setInfoText("Get ready to met something heavier than this little "
+                            "spaceships. On our radar we see something big and, "
+                            "perhaps, very dangerous to you! It would be better to "
+                            "use your alternative plasma weapon and shield. You may activate shield only "
+                            "once with button \"q\".");
+    boss_is_near_event->setInfoWindow(bin_window);
+    events.push_back(boss_is_near_event);
+
+    GameEventOfAppearing *boss_apr = new GameEventOfAppearing;
+    boss_apr->setCausePoint({6000, 600});
+
+    HeavyEnemy *boss = new HeavyEnemy();
+
+    boss->setPos(7500, 600);
+
+    boss_apr->setAppearingItem(boss);
+
+    events.push_back(boss_apr);
+
+    GameEventOfAppearing *boss1_apr = new GameEventOfAppearing;
+    boss1_apr->setCausePoint({8500, 1500});
+
+    HeavyEnemy *boss1 = new HeavyEnemy();
+
+    boss1->setPos(8500, 1500);
+
+    boss1_apr->setAppearingItem(boss1);
+
+    events.push_back(boss1_apr);
 }

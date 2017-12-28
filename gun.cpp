@@ -13,25 +13,40 @@
 #include <QCursor>
 #include <QGraphicsView>
 
+using WeaponOptions::Blaster;
+using WeaponOptions::Plasma;
+
 Gun::Gun(GameplayMovableItem *h, QObject *parent)
     : QObject(parent),
       hero(h)
 {
     pic = new QPixmap("tower.png");
-    bullet_pic = new QPixmap("bullet_1.png");
+    blaster_bullet_pic = new QPixmap("bullet_1.png");
+    plasma_bullet_pic = new QPixmap("bullet_2.png");
     timer = new QTimer(this);
     shooting_timer = new QTimer();
     connect(shooting_timer, SIGNAL(timeout()), SLOT(slotShooting()));
     connect(timer,          SIGNAL(timeout()), SLOT(slotTwirl()));
     player = new QMediaPlayer;
-    player->setVolume(100);
+    player->setVolume(60);
     playlist = new QMediaPlaylist();
-    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot_sound.wav")));
-    playlist->setPlaybackMode(QMediaPlaylist::Loop);
+    playlist->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
     player->setPlaylist(playlist);
     fs = new FlameStream(this);
     fs->setPos(mapToParent(0, -80));
     timer->start(18);
+
+    blaster_sound = new QMediaContent(QUrl::fromLocalFile("shoot_sound.wav"));
+    plasma_sound = new QMediaContent(QUrl::fromLocalFile("plasma_sound.wav"));
+
+    playlist->addMedia(*blaster_sound);
+    playlist->setCurrentIndex(0);
+
+    options.damage = 40;
+    options.bullet_pic = blaster_bullet_pic;
+    options.shot_interval = blaster_shot_interval;
+    options.has_dispersion = false;
+    options.single_move = 8;
 }
 
 Gun::~Gun()
@@ -87,7 +102,7 @@ void Gun::shoot(const bool f)
         player->play();
         is_shooting = true;
         slotShooting();             /*instant shot when button pressed*/
-        shooting_timer->start(shot_interval);
+        shooting_timer->start(options.shot_interval);
         fs->shootCall(true);
     }
     else {
@@ -100,9 +115,10 @@ void Gun::shoot(const bool f)
 
 void Gun::slotShooting()
 {
-    Bullet *bullet = new Bullet(25, bullet_pic, hero);
+    Bullet *bullet = new Bullet(options.damage, options.single_move, options.bullet_pic, hero);
     bullet->setPos(mapToParent(0, -100));
-    bullet->setRotation(this->rotation());
+    bullet->setRotation(this->rotation() +
+                        (options.has_dispersion? qPow(-1, qrand()) * (qrand() % 5) : 0));
     bullet->setZValue(2);
     scene()->addItem(bullet);
 }
@@ -131,4 +147,29 @@ QVariant Gun::itemChange(GraphicsItemChange change, const QVariant &value)
 bool Gun::isShooting() const
 {
     return is_shooting;
+}
+
+void Gun::changeWeapon()
+{
+    static bool w{true};
+    if (!w) {
+        options.bullet_pic = blaster_bullet_pic;
+        options.damage = blaster_damage;
+        options.shot_interval = blaster_shot_interval;
+        options.has_dispersion = false;
+        playlist->removeMedia(0);
+        playlist->addMedia(*blaster_sound);
+        options.single_move = 8;
+        w = true;
+    }
+    else {
+        options.bullet_pic = plasma_bullet_pic;
+        options.damage = plasma_damage;
+        options.shot_interval = plasma_shot_interval;
+        options.has_dispersion = true;
+        playlist->removeMedia(0);
+        playlist->addMedia(*plasma_sound);
+        options.single_move = 6;
+        w = false;
+    }
 }
