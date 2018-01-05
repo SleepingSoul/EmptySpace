@@ -10,9 +10,11 @@ CharacterExplosion::CharacterExplosion(QObject *parent)
 
     player = new QMediaPlayer;
     player->setMedia((QMediaContent(QUrl::fromLocalFile("Explosion.wav"))));
+    player->setVolume(50);
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(nextFrame()));
-    connect(player, SIGNAL(stateChanged(QMediaPlayer::State)), SLOT(slotMediaStateChanged(QMediaPlayer::State)));
+    connect(player, SIGNAL(stateChanged(QMediaPlayer::State)),
+            this,   SLOT(slotMediaStateChanged(QMediaPlayer::State)));
     timer->start(18);
     player->play();
 }
@@ -20,6 +22,7 @@ CharacterExplosion::CharacterExplosion(QObject *parent)
 CharacterExplosion::~CharacterExplosion()
 {
     delete player;
+    //delete spriteImage;
 }
 
 QRectF CharacterExplosion::boundingRect() const

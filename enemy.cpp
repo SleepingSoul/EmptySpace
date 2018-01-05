@@ -39,7 +39,10 @@ Enemy::Enemy(QObject *parent)
 
 Enemy::~Enemy()
 {
+    /*Cant delete bullet pic, because bullet can exist after our destruction*/
     delete player;
+    delete enemy_pic;
+    delete playlist;
 }
 
 void Enemy::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

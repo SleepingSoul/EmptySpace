@@ -46,13 +46,11 @@ private /*objects*/:
     QGraphicsProxyWidget *proxy_btn_no;
 
     /*Music features*/
-    QMediaPlayer         *player;               /*Media player for buttin clicked sound*/
+    QMediaPlayer         *player;               /*Media player for button clicked sound*/
     QTimer               *timer_before_change;  /*Timer after some button has clicked*/
-    QTimer               *cursor_timer;
     QTimer               *change_time_timer;
 
     /*Graphics*/
-    QPixmap              *quit_pic;
     QuitWindow           *quit_window;
 
     /*Time*/
@@ -62,7 +60,7 @@ private /*objects*/:
     QWidget              *state_widget;
 
     /*Game events*/
-    QList <GameEvent *> events;
+    QList <GameEvent *>  events;
 
     /*Widget size constants*/
     const int            wwidth;

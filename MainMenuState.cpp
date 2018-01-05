@@ -42,24 +42,28 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
 
     /*Set up music*/
     player = new QMediaPlayer;
+    player->setVolume(50);
 
     /*Allocate memory for buttons*/
     btn_play = new QPushButton;
     btn_settings = new QPushButton;
     btn_about = new QPushButton;
     btn_quit = new QPushButton;
+    btn_new_game = new QPushButton;
 
     /*Set up buttons*/
     setUpButton(btn_play, "btnPlay.png");
     setUpButton(btn_settings, "btnSettings.png");
     setUpButton(btn_about, "btnAbout.png");
     setUpButton(btn_quit, "btnQuit.png");
+    setUpButton(btn_new_game, "btnNewGame.png");
 
     /*Make buttons proxy to built them into scene*/
     QGraphicsProxyWidget *proxy_play = pmenu_scene->addWidget    (btn_play);
     QGraphicsProxyWidget *proxy_settings = pmenu_scene->addWidget(btn_settings);
     QGraphicsProxyWidget *proxy_about  = pmenu_scene->addWidget  (btn_about);
     QGraphicsProxyWidget *proxy_quit = pmenu_scene->addWidget    (btn_quit);
+    QGraphicsProxyWidget *proxy_new_game = pmenu_scene->addWidget(btn_new_game);
 
     /*Time*/
     text_time = new CustomTextItem;
@@ -68,7 +72,8 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
 
     /*Set up position of buttons on the scene*/
     proxy_play->setPos    (100, 200);
-    proxy_settings->setPos(proxy_play->pos() + QPoint(0, 75));
+    proxy_new_game->setPos(proxy_play->pos() + QPoint(0, 75));
+    proxy_settings->setPos(proxy_new_game->pos() + QPoint(0, 75));
     proxy_about->setPos   (proxy_settings->pos() + QPoint(0, 75));
     proxy_quit->setPos    (proxy_about->pos() + QPoint(0, 75));
 
@@ -77,6 +82,7 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
     connect(btn_settings, SIGNAL(clicked(bool)), SLOT(slotButtonSettings()));
     connect(btn_quit,     SIGNAL(clicked(bool)), SLOT(slotButtonQuit()));
     connect(btn_about,    SIGNAL(clicked(bool)), SLOT(slotButtonAbout()));
+    connect(btn_new_game, SIGNAL(clicked(bool)), SLOT(slotButtonNewGame()));
 
     /*Allocate and set up layout*/
     lout = new QGridLayout;
@@ -94,13 +100,6 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
     state_widget = new QWidget;
     state_widget->setFixedSize(wwidth, wheight);
     state_widget->setLayout(lout);
-
-    QCursor cursor(QPixmap("menu_cursor.png"));
-    state_widget->setCursor(cursor);
-    btn_play->setCursor(cursor);
-    btn_settings->setCursor(cursor);
-    btn_about->setCursor(cursor);
-    btn_quit->setCursor(cursor);
 }
 
 MainMenuState::~MainMenuState()
@@ -194,6 +193,25 @@ void MainMenuState::slotButtonAbout()
 
     connect(timer_before_change, SIGNAL(timeout()), SLOT(slotAboutState()));
     timer_before_change->start(CHANGE_T_MS);
+}
+
+void MainMenuState::slotButtonNewGame()
+{
+    player->stop();
+    player->setMedia(QUrl::fromLocalFile(SELECT_SOUND));
+    player->play();
+
+    connect(timer_before_change, SIGNAL(timeout()), SLOT(slotNewGame()));
+    timer_before_change->start(CHANGE_T_MS);
+}
+
+void MainMenuState::slotNewGame()
+{
+    timer_before_change->stop();
+    disconnect(timer_before_change, SIGNAL(timeout()), this, SLOT(slotNewGame()));
+    player->stop();
+
+    game_window->setState(State::NewGameplay);
 }
 
 void MainMenuState::slotQuitFromApp()

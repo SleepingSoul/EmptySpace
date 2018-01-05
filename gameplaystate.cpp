@@ -24,8 +24,8 @@
 #include "gameinfoevent.h"
 #include "gameeventofappearing.h"
 #include "infowindow.h"
-//#include "enemy.h"
 #include "heavyenemy.h"
+#include "warpeffect.h"
 
 #define CHANGE_T_MS 250
 
@@ -37,7 +37,7 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
 {
     /*Scene ,view and Hero initializing*/
     pgraphics_view =  new GameView;
-    pgraphics_scene = new GameScene(wwidth, wheight);
+    pgraphics_scene = new GameScene(wwidth, wheight, gwd->getPictureFromCache(Pictures::GameplayMap12000x12000));
     phero = new Hero;
 
     /*View set up*/
@@ -54,7 +54,7 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     pgraphics_scene->setSceneRect               (0, 0, 10000, 10000);
     pgraphics_view->setFixedSize                (wwidth - 2, wheight - 100);
     pgraphics_view->setMouseTracking            (true);
-    pgraphics_view->setCursor(QCursor(QPixmap("game_cursor.png")));
+    pgraphics_view->setCursor                   (QCursor(QPixmap("game_cursor.png")));
 
     pgraphics_scene->setView(pgraphics_view);
 
@@ -132,15 +132,22 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
 
     /*event activation*/
     slotButtonPauseClicked();
-    events.at(0)->executeEvent(pgraphics_scene);
+    //events.at(0)->executeEvent(pgraphics_scene);
 }
 
 GameplayState::~GameplayState()
 {
-    delete lout;
+    qDeleteAll(events);
+    delete lbl_time;
+    delete change_time_timer;
+    delete timer_before_change;
     delete player;
-    delete pgraphics_view;
+    delete btn_pause;
+    delete btn_to_menu;
+    delete phero;
+    delete lout;
     delete pgraphics_scene;
+    delete pgraphics_view;
 }
 
 QWidget *GameplayState::getStateWidget() const
@@ -238,7 +245,6 @@ void GameplayState::slotDontQuit()
 
 void GameplayState::slotButtonPauseClicked()
 {
-    qDebug() << "helllo word";
     if (paused) {
         pgraphics_view->setFocus();
         btn_pause->setIcon(QIcon(QPixmap("btnPause.png")));
@@ -269,18 +275,10 @@ void GameplayState::slotUpdateTime()
 
 void GameplayState::executeEvents()
 {
-    qDebug() << "events size: " << events.size();
     foreach (auto event, events) {
         if (!event->executed() && event->cause(pgraphics_view)) {
-            if (event->getEventType() == GameEvent::EventType::InfoEvent && !paused) {
-                slotButtonPauseClicked();
-            }
             event->executeEvent(pgraphics_scene);
         }
-    }
-    for (auto it = events.begin(); it != events.end(); ++it) {
-        if ((*it)->executed())
-            events.erase(it);
     }
 }
 
@@ -288,9 +286,9 @@ void GameplayState::makeEvents()
 {
     /*Gameplay events take place in this function*/
 
-    GameInfoEvent *first_info_event = new GameInfoEvent(this);
+    GameInfoEvent *first_info_event = new GameInfoEvent();
     first_info_event->setCausePoint({1500, 1000});
-    InfoWindow *i_window = new InfoWindow(700, 400);
+    InfoWindow *i_window = new InfoWindow(350, 200);
     i_window->setInfoText("Welcome, commander. You are a pilot of spaceship.\n "
                           "Control it with buttons \n W, A, S, D\n and mouse to "
                           "shoot. Sometimes i will help you to learn something new.\n "
@@ -303,28 +301,30 @@ void GameplayState::makeEvents()
     enemy_1_apr->setCausePoint({2050, 600});
     enemy_2_apr->setCausePoint({2050, 600});
 
-    Enemy *enemy_1 = new Enemy();
-    Enemy *enemy_2 = new Enemy();
-    enemy_1->setPos(2000, 400);
-    enemy_2->setPos(2000, 800);
+    WarpEffect *enemy_1_warp = new WarpEffect(new Enemy());
+    WarpEffect *enemy_2_warp = new WarpEffect(new Enemy());
+    //Enemy *enemy_1 = new Enemy();
+    //Enemy *enemy_2 = new Enemy();
+    enemy_1_warp->setPos(2000, 400);
+    enemy_2_warp->setPos(2000, 800);
 
-    enemy_1_apr->setAppearingItem(enemy_1);
-    enemy_2_apr->setAppearingItem(enemy_2);
+    enemy_1_apr->setAppearingItem(enemy_1_warp);
+    enemy_2_apr->setAppearingItem(enemy_2_warp);
 
     events.push_back(enemy_1_apr);
     events.push_back(enemy_2_apr);
 
-    GameInfoEvent *first_enemies_event = new GameInfoEvent(this);
+    GameInfoEvent *first_enemies_event = new GameInfoEvent();
     first_enemies_event->setCausePoint({2055, 600});
-    InfoWindow *i2_window = new InfoWindow(600, 400);
+    InfoWindow *i2_window = new InfoWindow(350, 200);
     i2_window->setInfoText("It looks like you have just met your first enemies. Be carefull!\n"
                            "Try to use clever tactic and not to take damage");
     first_enemies_event->setInfoWindow(i2_window);
     events.push_back(first_enemies_event);
 
-    GameInfoEvent *heal_event = new GameInfoEvent(this);
+    GameInfoEvent *heal_event = new GameInfoEvent();
     heal_event->setCausePoint({2500, 600});
-    InfoWindow *he_window = new InfoWindow(600, 400);
+    InfoWindow *he_window = new InfoWindow(350, 200);
     he_window->setInfoText("After enemy die - you can collect some bonuses which had been "
                            "left by enemies on the space. Fox example, you can charge your "
                            "HP with this healing items!");
@@ -335,34 +335,34 @@ void GameplayState::makeEvents()
     GameEventOfAppearing *enemy_4_apr = new GameEventOfAppearing;
     GameEventOfAppearing *enemy_5_apr = new GameEventOfAppearing;
     GameEventOfAppearing *enemy_6_apr = new GameEventOfAppearing;
-    enemy_3_apr->setCausePoint({4000, 600});
-    enemy_4_apr->setCausePoint({4250, 600});
+    enemy_3_apr->setCausePoint({4600, 600});
+    enemy_4_apr->setCausePoint({4600, 600});
     enemy_5_apr->setCausePoint({4600, 600});
-    enemy_6_apr->setCausePoint({4900, 600});
+    enemy_6_apr->setCausePoint({4600, 600});
 
-    Enemy *enemy_3 = new Enemy();
-    Enemy *enemy_4 = new Enemy();
-    Enemy *enemy_5 = new Enemy();
-    Enemy *enemy_6 = new Enemy();
+    WarpEffect *enemy_3_w = new WarpEffect(new Enemy());
+    WarpEffect *enemy_4_w = new WarpEffect(new Enemy());
+    WarpEffect *enemy_5_w = new WarpEffect(new Enemy());
+    WarpEffect *enemy_6_w = new WarpEffect(new Enemy());
 
-    enemy_3->setPos(4000, 500);
-    enemy_4->setPos(4100, 800);
-    enemy_5->setPos(3900, 600);
-    enemy_6->setPos(4000, 1000);
+    enemy_3_w->setPos(4000, 500);
+    enemy_4_w->setPos(4100, 800);
+    enemy_5_w->setPos(3900, 600);
+    enemy_6_w->setPos(4000, 1000);
 
-    enemy_3_apr->setAppearingItem(enemy_3);
-    enemy_4_apr->setAppearingItem(enemy_4);
-    enemy_5_apr->setAppearingItem(enemy_5);
-    enemy_6_apr->setAppearingItem(enemy_6);
+    enemy_3_apr->setAppearingItem(enemy_3_w);
+    enemy_4_apr->setAppearingItem(enemy_4_w);
+    enemy_5_apr->setAppearingItem(enemy_5_w);
+    enemy_6_apr->setAppearingItem(enemy_6_w);
 
     events.push_back(enemy_3_apr);
     events.push_back(enemy_4_apr);
     events.push_back(enemy_5_apr);
     events.push_back(enemy_6_apr);
 
-    GameInfoEvent *boss_is_near_event = new GameInfoEvent(this);
+    GameInfoEvent *boss_is_near_event = new GameInfoEvent();
     boss_is_near_event->setCausePoint({5500, 600});
-    InfoWindow *bin_window = new InfoWindow(600, 400);
+    InfoWindow *bin_window = new InfoWindow(350, 200);
     bin_window->setInfoText("Get ready to met something heavier than this little "
                             "spaceships. On our radar we see something big and, "
                             "perhaps, very dangerous to you! It would be better to "

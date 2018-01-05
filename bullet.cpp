@@ -6,6 +6,9 @@
 #include <QGraphicsScene>
 #include "explosion.h"
 
+QTimer *Bullet::global_bullet_timer = nullptr;
+unsigned short Bullet::bullet_number = 0;
+
 Bullet::Bullet(const int d, const int sm, QPixmap *bullet_pic, GameplayMovableItem *s, QObject *parent)
     : QObject(parent),
       bulletPic(bullet_pic),
@@ -13,14 +16,21 @@ Bullet::Bullet(const int d, const int sm, QPixmap *bullet_pic, GameplayMovableIt
       damage(d),
       single_move(sm)
 {
-    ptimer = new QTimer(this);
-    connect(ptimer, SIGNAL(timeout()), SLOT(slotTimerBullet()));
+    ++bullet_number;
+    /*Init timer (in fist bullet)*/
+    if (!global_bullet_timer) {
+        global_bullet_timer = new QTimer;
+    }
+
+    connect(global_bullet_timer, SIGNAL(timeout()), SLOT(slotTimerBullet()));
+
     has_hero_sender = s->isHeroType();
 }
 
 Bullet::~Bullet()
 {
-
+    disconnect(global_bullet_timer, SIGNAL(timeout()), this, SLOT(slotTimerBullet()));
+    --bullet_number;
 }
 
 QRectF Bullet::boundingRect() const
@@ -69,19 +79,19 @@ void Bullet::slotTimerBullet()
     if (!this->isInView())
         should_be_destroyed = true;
 
-    if (should_be_destroyed)
+    if (should_be_destroyed) {
         this->deleteLater();
-}
+    }
 
-int Bullet::Damage() const
-{
-    return damage;
+    if (bullet_number == 0) {
+        global_bullet_timer->stop();
+    }
 }
 
 QVariant Bullet::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemSceneChange && value.value <QGraphicsScene *>()) {    //value = scene ptr
-        ptimer->start(_timerTemp_ms);
+    if (change == ItemSceneChange && value.value <QGraphicsScene *>() && !global_bullet_timer->isActive()) {
+        global_bullet_timer->start(_timerTemp_ms);
     }
     return QGraphicsItem::itemChange(change, value);
 }
@@ -93,10 +103,12 @@ int Bullet::type() const
 
 void Bullet::stopTime()
 {
-    ptimer->stop();
+    if (global_bullet_timer->isActive())
+        global_bullet_timer->stop();
 }
 
 void Bullet::startTime()
 {
-    ptimer->start(_timerTemp_ms);
+    if (!global_bullet_timer->isActive())
+        global_bullet_timer->start(_timerTemp_ms);
 }

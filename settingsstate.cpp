@@ -14,6 +14,7 @@
 #include <QComboBox>
 #include "templates.h"
 #include <QApplication>
+#include <QCheckBox>
 
 SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh)
     : wwidth(ww), wheight(wh), game_window(gwd),
@@ -98,6 +99,22 @@ SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh)
 
     connect(wp_combo_box, SIGNAL(currentIndexChanged(int)), SLOT(slotWpChangeApplied(int)));
 
+    /*Notifications en/dis check box:*/
+    ntf_check_box = new QCheckBox;
+    ntf_check_box->setText("Enable tips");
+    ntf_check_box->setStyleSheet(
+                "QCheckBox {"
+                    "spacing: 5px;"
+                "}"
+                "QCheckBox::indicator {"
+                    "width: 13px;"
+                    "height: 13px;"
+                "}"
+                ""
+                ""
+                ""
+                "");
+
     /*Combo box undertext*/
     QGraphicsTextItem *txt_combo_box = pstgs_scene->addText("Choose background theme:");
     txt_combo_box->setFont(font);
@@ -109,9 +126,11 @@ SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh)
     QGraphicsProxyWidget *proxy_slider = pstgs_scene->addWidget(volume_slider);
     QGraphicsProxyWidget *proxy_btn = pstgs_scene->addWidget(btn_to_menu);
     QGraphicsProxyWidget *proxy_combo_box = pstgs_scene->addWidget(wp_combo_box);
+    QGraphicsProxyWidget *proxy_check_box = pstgs_scene->addWidget(ntf_check_box);
     proxy_btn->setPos(50, 50);
     proxy_slider->setPos(100, 170);
     proxy_combo_box->setPos(100, 240);
+    proxy_check_box->setPos(100, 310);
 
     /*allocating memory and set up mediaplayer for
      * sound of clicking on button*/
@@ -131,13 +150,11 @@ SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh)
 
 SettingsState::~SettingsState()
 {
-    //delete bg;
     writeSettings();
     delete lout;
     delete player;
     delete pstgs_scene;
     delete pgraphics_view;
-    qDebug() << "SS destr";
 }
 
 QWidget *SettingsState::getStateWidget() const

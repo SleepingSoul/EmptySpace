@@ -12,8 +12,8 @@ class QLabel;
 class QPushButton;
 class QMediaPlayer;
 class QTimer;
-class QQuickWidget;
 class QComboBox;
+class QCheckBox;
 
 class SettingsState : public State
 {
@@ -34,8 +34,11 @@ private /*objects*/:
 
     GameWindow *game_window;
     QGridLayout *lout;
+    /*Settings setters:*/
     QSlider *volume_slider;
     QComboBox *wp_combo_box;
+    QCheckBox *ntf_check_box;
+
     QPixmap *bg;
     SettingsScene *pstgs_scene;
     QGraphicsView *pgraphics_view;

@@ -13,7 +13,7 @@ class State : public QObject
 {
     Q_OBJECT
 public:
-    enum ID{MainMenu = 0, Settings, Gameplay, About};
+    enum ID{MainMenu = 0, Settings, Gameplay, About, NewGameplay};
 
     State() {}
     virtual ~State() {}

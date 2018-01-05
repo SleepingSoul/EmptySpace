@@ -3,6 +3,7 @@
 
 #include <QStackedWidget>
 #include "state.h"
+#include "global_enumerations.h"
 
 class QGraphicsView;
 class QWidget;
@@ -13,6 +14,7 @@ class QVBoxLayout;
 class BGMusicPlayer;
 class GameplayState;
 class SettingsState;
+class MediaCache;
 
 class GameWindow : public QStackedWidget
 {
@@ -22,6 +24,7 @@ public:
     ~GameWindow();
     void setState(State::ID);
     QCursor getStandardCursor() const;
+    QPixmap *getPictureFromCache(Pictures::Type);
 
 private:
     /*Widnow states*/
@@ -33,6 +36,7 @@ private:
     QCursor standard_cursor;
 
     BGMusicPlayer   *music_player;
+    MediaCache      *m_cache;
     int             wwidth;
     int             wheight;
 };

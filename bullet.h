@@ -4,11 +4,6 @@
 #include <QObject>
 #include "gameplaymovableitem.h"
 
-/*Parent classes:
- * QObject: for signals/slots;
- * QGraphicsItem: for placing on the scene;
- * GameplayItem: to eneble/disable timers */
-
 class Bullet : public QObject, public GameplayMovableItem
 {
     Q_OBJECT
@@ -16,9 +11,6 @@ public:
     explicit Bullet(const int, const int, QPixmap *, GameplayMovableItem * = nullptr, QObject * = 0);
     ~Bullet();
 
-    int Damage     () const;
-    QPointF Pos    () const;
-    QPointF nextPos();
     int type       () const override;
 
     /*Stop/start all timers*/
@@ -34,15 +26,16 @@ private /*functions*/:
     QVariant itemChange(GraphicsItemChange, const QVariant &) override;
 
 private /*objects*/:
-    QTimer    *ptimer;
+    /*Global timer for all bullets - for optimisation*/
+    static QTimer    *global_bullet_timer;
     QPixmap   *bulletPic;
     GameplayMovableItem *sender;
     const int damage {25};
     const int single_move {7};
     bool has_hero_sender;
 
-    /*All bullets if flying with same speed (maybe, no?)*/
-    static const int _timerTemp_ms {15};
+    static unsigned short bullet_number;
+    static const int _timerTemp_ms {17};
 
 private slots:
     void slotTimerBullet();

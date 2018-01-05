@@ -17,17 +17,19 @@
 #include "minimap.h"
 #include "weapon.h"
 #include "charger.h"
+#include "infowindow.h"
 
-GameScene::GameScene(const int w, const int h, QObject *parent)
-    : QGraphicsScene(), wwidth(w), wheight(h)
+GameScene::GameScene(const int w, const int h, const QPixmap *bg, QObject *parent)
+    : QGraphicsScene(), wwidth(w), wheight(h), bg_image(bg)
 {
+    if (!bg)
+        assert(false);
+
     readDecorations(QString("decor.txt"));
 
     foreach(Decoration *dec, dec_list) {
         this->addItem(dec);
     }
-
-    bg_image = new QPixmap("map_picture.jpg");
 
     hp_line = new HpLine();
     mini_map = new MiniMap();
@@ -49,6 +51,10 @@ GameScene::GameScene(const int w, const int h, QObject *parent)
 GameScene::~GameScene()
 {
     qDeleteAll(dec_list);
+    delete charger;
+    delete weapon;
+    delete mini_map;
+    delete hp_line;
 }
 
 void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
@@ -61,6 +67,11 @@ void GameScene::drawBackground(QPainter *painter, const QRectF &rect)
     mini_map->setPos(rect.x() + 10, rect.y() + rect.height() - 260);
     weapon->setPos(rect.x() + rect.width() - 200, rect.y() + rect.height() - 250);
     charger->setPos(rect.x() + 10, rect.y() + rect.height() - 460);
+
+    size_t num = 0;
+    foreach (auto info_w, info_windows_v) {
+        info_w->setPos(rect.topRight() + QPointF(-info_w->Width() - 50, 50 + (num++ * info_w->Height() + 20)));
+    }
 }
 
 void GameScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -163,4 +174,16 @@ void GameScene::keyReleaseEvent(QKeyEvent *event)
 void GameScene::setView(QGraphicsView *v)
 {
     view = v;
+}
+
+void GameScene::addInfoWindow(InfoWindow *iw)
+{
+    info_windows_v.append(iw);
+    this->addItem(iw);
+}
+
+void GameScene::popInfoWindow()
+{
+    if (!info_windows_v.empty())
+        info_windows_v.removeFirst();
 }

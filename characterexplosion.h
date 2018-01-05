@@ -4,13 +4,9 @@
 #include "explosion.h"
 #include <QMediaPlayer>
 
-/*Parent classes:
- * QObject: for signals/slots;
- * QGraphicsItem: for placing on the scene;
- * GameplayItem: to eneble/disable timers */
-
 class CharacterExplosion : public Explosion
 {
+    Q_OBJECT
 public:
     explicit CharacterExplosion(QObject *parent = 0);
     ~CharacterExplosion();

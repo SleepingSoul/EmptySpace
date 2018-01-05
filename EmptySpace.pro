@@ -59,7 +59,10 @@ SOURCES += main.cpp\
     heavyenemy.cpp \
     shield.cpp \
     shieldswindow.cpp \
-    characterexplosion.cpp
+    characterexplosion.cpp \
+    gameevent.cpp \
+    mediacache.cpp \
+    warpeffect.cpp
 
 HEADERS  += \
     myapplication.h \
@@ -104,7 +107,9 @@ HEADERS  += \
     heavyenemy.h \
     shield.h \
     shieldswindow.h \
-    characterexplosion.h
+    characterexplosion.h \
+    mediacache.h \
+    warpeffect.h
 
 FORMS    += widget.ui
 

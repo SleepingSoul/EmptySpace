@@ -16,6 +16,9 @@ class GameEvent
 public:
     enum EventType{InfoEvent = 0, EventOfAppearing};
 
+    GameEvent() {}
+    virtual ~GameEvent() = 0;
+
     virtual void executeEvent(QGraphicsScene *) = 0;
     virtual EventType getEventType() const = 0;
 

@@ -5,21 +5,16 @@
 #include <QPainter>
 #include "gameplayitem.h"
 
-/*Parent classes:
- * QGraphicsItem: for placing on the scene;
- * GameplayItem: to eneble/disable timers */
+/*Parent class:
+ * GameplayItem: to place on GameScene */
 
 class Decoration : public GameplayItem
 {
 public:
     explicit Decoration(QPolygon);
     ~Decoration();
-    //void set_polygon(QPolygon);
-    //QPolygon Polygon() const;
-    //void set_def_pos(const QPoint);
-    //QPoint def_pos  () const;
-    int type() const override;
 
+    int type() const override;
     void startTime() override {}    //Decorations is not movable game items, so
     void stopTime() override  {}    //we do not have to do something here.
 private:

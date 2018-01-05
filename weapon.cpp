@@ -12,7 +12,7 @@ Weapon::Weapon(QObject *parent)
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotChangeOffset()));
 
-    this->setZValue(4);
+    this->setZValue(5);
 }
 
 Weapon::~Weapon()

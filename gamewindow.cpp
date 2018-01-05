@@ -15,6 +15,7 @@
 #include "hero.h"
 #include "bgmusicplayer.h"
 #include <QIcon>
+#include "mediacache.h"
 
 GameWindow::GameWindow()
 {
@@ -28,11 +29,14 @@ GameWindow::GameWindow()
     /*Main bg music player allocation*/
     music_player = new BGMusicPlayer;
 
+    /*Media cache*/
+    m_cache = new MediaCache();
+
     standard_cursor = QCursor(QPixmap("menu_cursor.png"));
 
     /*All states memory allocation*/
     menu_state =     new MainMenuState(this, wwidth, wheight);
-    settings_state = new SettingsState(this, wwidth, wheight); /*from qsettings*/
+    settings_state = new SettingsState(this, wwidth, wheight);
     gameplay_state = new GameplayState(this, wwidth, wheight);
     about_state =    new AboutState   (this, wwidth, wheight);
 
@@ -87,6 +91,17 @@ void GameWindow::setState(State::ID id)
         dynamic_cast <GameplayState *>(gameplay_state)->getView()->setFocus();
         break;
 
+    case State::NewGameplay:
+        this->removeWidget(gameplay_state->getStateWidget());
+        delete gameplay_state;
+        gameplay_state = new GameplayState(this, wwidth, wheight);
+        this->insertWidget(2, gameplay_state->getStateWidget());
+
+        music_player->playGameplayMusic();
+        this->setCurrentIndex(State::Gameplay);
+        dynamic_cast <GameplayState *>(gameplay_state)->getView()->setFocus();
+        break;
+
     case State::Settings:
         this->setCurrentIndex(State::Settings);
         break;
@@ -96,4 +111,9 @@ void GameWindow::setState(State::ID id)
         this->setCurrentIndex(State::About);
         break;
     }
+}
+
+QPixmap *GameWindow::getPictureFromCache(Pictures::Type type)
+{
+    return m_cache->getPicture(type);
 }

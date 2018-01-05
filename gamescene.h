@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QSet>
 #include <QList>
+#include <QVector>
 
 class QPixmap;
 class Decoration;
@@ -13,17 +14,20 @@ class MiniMap;
 class Weapon;
 class Charger;
 class QGraphicsView;
+class InfoWindow;
 
 class GameScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    explicit GameScene(const int, const int, QObject * = 0);
+    explicit GameScene(const int, const int, const QPixmap *, QObject * = 0);
     ~GameScene();
 
     void readDecorations(const QString);             //read decoration polygons from file
     void setHero(Hero *);
     void setView(QGraphicsView *);
+    void addInfoWindow(InfoWindow *);
+    void popInfoWindow();
 
 signals:
     void signalTargetCoordinate();
@@ -45,7 +49,8 @@ private /*objects*/:
     Hero *phero;
     QList <Decoration *>   dec_list;            //vector which contains all Decorations;
     QSet <Qt::Key>         pr_keys;             //set which contains all legal pressed and not released keys;
-    QPixmap                *bg_image;
+    QVector <InfoWindow *> info_windows_v;
+    const QPixmap          *bg_image;
     QBrush                 *footer_brush;
     QPolygon               footer_polygon;
     QTimer                 *fps_timer;
@@ -56,6 +61,7 @@ private /*objects*/:
     MiniMap                *mini_map;
     Weapon                 *weapon;
     Charger                *charger;
+    InfoWindow             *info_window {nullptr};
 
     qreal                  hero_angle;
     QGraphicsView          *view;

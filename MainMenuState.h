@@ -35,10 +35,13 @@ private /*objects*/:
     QGraphicsView        *pgraphics_view;
     GameWindow           *game_window;
     QMediaPlayer         *player;
+    /*Buttons:*/
     QPushButton          *btn_play;
     QPushButton          *btn_settings;
     QPushButton          *btn_about;
     QPushButton          *btn_quit;
+    QPushButton          *btn_new_game;
+
     QTimer               *timer_before_change;
     QTimer               *timer_current_time;
     QWidget              *state_widget;
@@ -56,7 +59,9 @@ private slots:
     void slotButtonSettings();
     void slotButtonQuit();
     void slotButtonAbout();
+    void slotButtonNewGame();
     void slotAboutState();
+    void slotNewGame();
 
     void slotUpdateTime();
 

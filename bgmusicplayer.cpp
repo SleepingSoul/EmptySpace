@@ -41,7 +41,6 @@ void BGMusicPlayer::playMenuMusic()
 
 void BGMusicPlayer::setVolume(int v)
 {
-    qDebug() << "Set volume: " << v;
     player->setVolume(v);
 }
 

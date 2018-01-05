@@ -12,11 +12,6 @@ class QMediaPlayer;
 class QMediaPlaylist;
 class QMediaContent;
 
-/* Parent classes:
- * QObject: for signals/slots;
- * QGraphicsItem: for placing on the scene;
- * GameplayItem: to eneble/disable timers */
-
 class Gun : public QObject, public GameplayItem
 {
     Q_OBJECT

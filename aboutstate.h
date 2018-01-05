@@ -25,7 +25,7 @@ private:
     AboutScene    *pabout_scene;
     QGraphicsView *pgraphics_view;
 
-    /*GameWindow pointer to emin change state signal*/
+    /*GameWindow pointer to emit change state signal*/
     GameWindow    *game_window;
 
     /*Buttons*/
