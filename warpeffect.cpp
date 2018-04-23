@@ -11,9 +11,9 @@ WarpEffect::WarpEffect(QGraphicsItem *warped, QObject *parent)
 {
     ++number_of_warps;
     timer = new QTimer(this);
-    sprite_image.load("appearing_sprite.png");
+    sprite_image.load("media/appearing_sprite.png");
     player = new QMediaPlayer(this);
-    player->setMedia(QMediaContent(QUrl::fromLocalFile("warp_sound.mp3")));
+    player->setMedia(QMediaContent(QUrl::fromLocalFile("media/warp_sound.mp3")));
     connect(player, SIGNAL(stateChanged(QMediaPlayer::State)),
             this,   SLOT  (slotMediaStateChanged(QMediaPlayer::State)));
     connect(timer, SIGNAL(timeout()), SLOT(slotNextFrame()));

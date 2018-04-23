@@ -6,8 +6,8 @@
 Charger::Charger(QObject *parent)
     : QObject(parent)
 {
-    bg_image_a.load("a_chargers_picture.png");
-    bg_image_una.load("una_chargers_picture.png");
+    bg_image_a.load("media/a_chargers_picture.png");
+    bg_image_una.load("media/una_chargers_picture.png");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotTimer()));
 }

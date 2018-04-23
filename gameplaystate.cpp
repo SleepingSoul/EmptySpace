@@ -54,7 +54,7 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     pgraphics_scene->setSceneRect               (0, 0, 10000, 10000);
     pgraphics_view->setFixedSize                (wwidth - 2, wheight - 100);
     pgraphics_view->setMouseTracking            (true);
-    pgraphics_view->setCursor                   (QCursor(QPixmap("game_cursor.png")));
+    pgraphics_view->setCursor                   (QCursor(QPixmap("media/game_cursor.png")));
 
     pgraphics_scene->setView(pgraphics_view);
 
@@ -78,10 +78,10 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
 
     /*Buttons set up*/
     btn_to_menu = new QPushButton;
-    setUpButton(btn_to_menu, "btnBackMenu.png");
+    setUpButton(btn_to_menu, "media/btnBackMenu.png");
 
     btn_pause = new QPushButton;
-    setUpButton(btn_pause, "btnPause.png");
+    setUpButton(btn_pause, "media/btnPause.png");
 
     /*Date/time*/
     lbl_time = new QLabel(QDateTime::currentDateTime().time().toString());
@@ -113,7 +113,7 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     timer_before_change = new QTimer(this);
     change_time_timer = new QTimer(this);
     connect(change_time_timer, SIGNAL(timeout()), SLOT(slotUpdateTime()));
-    change_time_timer->start(1000);
+    change_time_timer->start(500);
 
     /*Events set up*/
     Enemy::setHero(phero);
@@ -125,7 +125,7 @@ GameplayState::GameplayState(GameWindow *gwd, const int ww, const int wh)
     state_widget->setLayout   (lout);
     QPalette palette;
     QBrush brush;
-    brush.setTexture(QPixmap("panel_texture.jpg"));
+    brush.setTexture(QPixmap("media/panel_texture.jpg"));
     palette.setBrush(QPalette::Background, brush);
     state_widget->setAutoFillBackground(true);
     state_widget->setPalette(palette);
@@ -183,8 +183,8 @@ void GameplayState::slotButtonToMenuClicked()
     QPushButton *btnOk = new QPushButton;
     QPushButton *btnNo = new QPushButton;
 
-    setUpButton(btnOk, "btnYesQuit.png");
-    setUpButton(btnNo, "btnCancel.png");
+    setUpButton(btnOk, "media/btnYesQuit.png");
+    setUpButton(btnNo, "media/btnCancel.png");
 
     proxy_btn_ok = pgraphics_scene->addWidget(btnOk);
     proxy_btn_no = pgraphics_scene->addWidget(btnNo);
@@ -247,14 +247,14 @@ void GameplayState::slotButtonPauseClicked()
 {
     if (paused) {
         pgraphics_view->setFocus();
-        btn_pause->setIcon(QIcon(QPixmap("btnPause.png")));
+        btn_pause->setIcon(QIcon(QPixmap("media/btnPause.png")));
         paused = false;
         foreach (auto item, pgraphics_scene->items()) {
             dynamic_cast <GameplayItem *>(item)->startTime();
         }
     }
     else {
-        btn_pause->setIcon(QIcon(QPixmap("btnPlay.png")));
+        btn_pause->setIcon(QIcon(QPixmap("media/btnPlay.png")));
         paused = true;
         foreach (auto item, pgraphics_scene->items()) {
             qDebug() << "helllo word";

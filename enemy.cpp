@@ -21,8 +21,8 @@ void Enemy::setHero(QGraphicsItem *h)
 Enemy::Enemy(QObject *parent)
     : QObject(parent)
 {
-    enemy_pic = new QPixmap("spaceship_pic150x150.png");
-    bullet_pic = new QPixmap("bullet_3.png");
+    enemy_pic = new QPixmap("media/spaceship_pic150x150.png");
+    bullet_pic = new QPixmap("media/bullet_3.png");
     timer = new QTimer(this);
     shooting_timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotTimer()));
@@ -31,7 +31,7 @@ Enemy::Enemy(QObject *parent)
     player = new QMediaPlayer;
     player->setVolume(50);
     playlist = new QMediaPlaylist();
-    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot_sound.wav")));
+    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("media/shoot_sound.wav")));
     playlist->setPlaybackMode(QMediaPlaylist::Loop);
     player->setPlaylist(playlist);
     shot_interval = 500;

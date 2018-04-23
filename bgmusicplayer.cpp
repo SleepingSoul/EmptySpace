@@ -4,8 +4,8 @@
 BGMusicPlayer::BGMusicPlayer()
 {
     player = new QMediaPlayer;
-    gameplay_music = new QMediaContent(QUrl::fromLocalFile("Star Wars- The Imperial March.mp3"));
-    menu_music = new QMediaContent(QUrl::fromLocalFile("Wings of Liberty.mp3"));
+    gameplay_music = new QMediaContent(QUrl::fromLocalFile("media/Star Wars- The Imperial March.mp3"));
+    menu_music = new QMediaContent(QUrl::fromLocalFile("media/Wings of Liberty.mp3"));
 }
 
 BGMusicPlayer::~BGMusicPlayer()

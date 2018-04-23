@@ -55,7 +55,7 @@ AboutState::AboutState(GameWindow *gwd, const int ww, const int wh)
 
     /*Allocate memory and set up buttons*/
     btn_menu = new QPushButton;
-    setUpButton(btn_menu, "btnBackMenu.png");
+    setUpButton(btn_menu, "media/btnBackMenu.png");
 
     QGraphicsProxyWidget *proxy_back_menu = pabout_scene->addWidget(btn_menu);
     proxy_back_menu->setPos(50, 50);

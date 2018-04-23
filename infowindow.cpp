@@ -3,15 +3,13 @@
 #include <QPixmap>
 #include <QTimer>
 #include <gamescene.h>
-#include <QDateTime>
-#include <QDebug>
 
 InfoWindow::InfoWindow(const int w, const int h, QObject *parent)
     : width(w), height(h), QObject(parent), offset(w)
 {
     font.setPointSize(8);
     font.setFamily("Lucida Console");
-    bg_image = new QPixmap("info_window_bg.png");
+    bg_image = new QPixmap("media/info_window_bg.png");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotTimer()));
 }
@@ -38,7 +36,6 @@ int InfoWindow::type() const
 
 void InfoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    qDebug() << "Before: " << QDateTime::currentMSecsSinceEpoch();
     painter->setPen(QPen(Qt::NoPen));
     painter->drawPixmap(0 + width - offset, 0, width, height, *bg_image);
     painter->setPen(QPen(Qt::white));
@@ -47,8 +44,6 @@ void InfoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     Q_UNUSED(option);
     Q_UNUSED(widget);
-
-    qDebug() << "After: " << QDateTime::currentMSecsSinceEpoch();
 }
 
 QRectF InfoWindow::boundingRect() const

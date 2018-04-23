@@ -5,7 +5,7 @@
 Shield::Shield(QObject *parent)
     : QObject(parent)
 {
-    shield_image.load("shield_image.png");
+    shield_image.load("media/shield_image.png");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotTimer()));
 }

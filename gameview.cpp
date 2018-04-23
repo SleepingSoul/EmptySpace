@@ -4,7 +4,7 @@
 
 GameView::GameView()
 {
-    cursor_pic.load("game_cursor.png");
+    cursor_pic.load("media/game_cursor.png");
 }
 
 GameView::~GameView()

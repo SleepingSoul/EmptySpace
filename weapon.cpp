@@ -6,8 +6,8 @@
 Weapon::Weapon(QObject *parent)
     : QObject(parent)
 {
-    bg_image.load("weapon_picture.png");
-    weapon_image.load("weapons.png");
+    bg_image.load("media/weapon_picture.png");
+    weapon_image.load("media/weapons.png");
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotChangeOffset()));

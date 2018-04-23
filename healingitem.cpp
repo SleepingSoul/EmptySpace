@@ -3,7 +3,7 @@
 
 HealingItem::HealingItem()
 {
-    pic = new QPixmap("healing_item.png");
+    pic = new QPixmap("media/healing_item.png");
 }
 
 HealingItem::~HealingItem()

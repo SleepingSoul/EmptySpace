@@ -18,7 +18,7 @@
 Hero::Hero(QObject *parent)
     : QObject(parent)
 {
-    hero_pic = new QPixmap("spaceship.png");
+    hero_pic = new QPixmap("media/spaceship.png");
     ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotHeroTimer()));
 
@@ -26,7 +26,7 @@ Hero::Hero(QObject *parent)
     connect(charge_timer, SIGNAL(timeout()), SLOT(slotChargeEnded()));
 
     player = new QMediaPlayer(this);
-    player->setMedia(QMediaContent(QUrl::fromLocalFile("charging.wav")));
+    player->setMedia(QMediaContent(QUrl::fromLocalFile("media/charging.wav")));
 
     left_th = new HeroThrust;
     right_th = new HeroThrust;

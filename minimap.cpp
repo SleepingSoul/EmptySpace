@@ -3,7 +3,7 @@
 
 MiniMap::MiniMap()
 {
-    minimap_pic = new QPixmap("minimap_picture.png");
+    minimap_pic = new QPixmap("media/minimap_picture.png");
     this->setZValue(4);
 }
 

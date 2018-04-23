@@ -4,7 +4,7 @@
 
 QuitWindow::QuitWindow()
 {
-    pic = new QPixmap("panel_bg.png");
+    pic = new QPixmap("media/panel_bg.png");
 }
 
 QuitWindow::~QuitWindow()

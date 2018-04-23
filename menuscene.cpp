@@ -8,7 +8,7 @@ MenuScene::MenuScene(const int w, const int h, QObject *parent)
       WIDTH(w),
       HEIGHT(h)
 {
-    logo = new QPixmap("emptyspace_logo.png");
+    logo = new QPixmap("media/emptyspace_logo.png");
     bg = new QPixmap;   //will be loaded when settings readed in mainmenustate
     opacity_timer = new QTimer(this);
     connect(opacity_timer, SIGNAL(timeout()), SLOT(slotChangeOpacity()));
@@ -50,10 +50,10 @@ void MenuScene::setBackgroundImage(const int idx)
 {
     switch (idx) {
     case 0:
-        bg->load("menu_bg.jpg");
+        bg->load("media/menu_bg.jpg");
         break;
     case 1:
-        bg->load("wallpaper_2.jpg");
+        bg->load("media/wallpaper_2.jpg");
         break;
     default:
         qDebug() << "Fail " << idx;

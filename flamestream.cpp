@@ -6,7 +6,7 @@
 FlameStream::FlameStream(QObject *parent)
     : QObject(parent)
 {
-    blaster_sprite = new QPixmap("shooting_sp.png");
+    blaster_sprite = new QPixmap("media/shooting_sp.png");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotFrame()));
 }

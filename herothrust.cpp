@@ -8,7 +8,7 @@
 HeroThrust::HeroThrust(QObject *parent)
     : QObject(parent)
 {
-    sprite = new QPixmap("thrust_sp.png");
+    sprite = new QPixmap("media/thrust_sp.png");
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotTick()));
 }

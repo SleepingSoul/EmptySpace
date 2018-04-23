@@ -32,7 +32,7 @@ GameWindow::GameWindow()
     /*Media cache*/
     m_cache = new MediaCache();
 
-    standard_cursor = QCursor(QPixmap("menu_cursor.png"));
+    standard_cursor = QCursor(QPixmap("media/menu_cursor.png"));
 
     /*All states memory allocation*/
     menu_state =     new MainMenuState(this, wwidth, wheight);
@@ -50,7 +50,7 @@ GameWindow::GameWindow()
     /*Now, we will set correct volume to music player*/
     music_player->setVolume(dynamic_cast <SettingsState *>(settings_state)->Volume());
 
-    this->setWindowIcon(QIcon(QPixmap("es_icon.png")));
+    this->setWindowIcon(QIcon(QPixmap("media/es_icon.png")));
 
     /*We add all state's widgets in stacked widget*/
     this->addWidget(menu_state->getStateWidget());

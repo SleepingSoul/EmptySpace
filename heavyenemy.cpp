@@ -13,8 +13,8 @@
 
 HeavyEnemy::HeavyEnemy()
 {
-    enemy_pic = new QPixmap("m_falcon.png");
-    bullet_pic = new QPixmap("bullet_4.png");
+    enemy_pic = new QPixmap("media/m_falcon.png");
+    bullet_pic = new QPixmap("media/bullet_4.png");
     timer = new QTimer(this);
     shooting_timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(slotTimer()));
@@ -23,7 +23,7 @@ HeavyEnemy::HeavyEnemy()
     player = new QMediaPlayer;
     player->setVolume(50);
     playlist = new QMediaPlaylist();
-    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("shoot_sound.wav")));
+    playlist->addMedia(QMediaContent(QUrl::fromLocalFile("media/shoot_sound.wav")));
     playlist->setPlaybackMode(QMediaPlaylist::Loop);
     player->setPlaylist(playlist);
     hp = 1000;

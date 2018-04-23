@@ -52,11 +52,11 @@ MainMenuState::MainMenuState(GameWindow *gwd, const int ww, const int wh)
     btn_new_game = new QPushButton;
 
     /*Set up buttons*/
-    setUpButton(btn_play, "btnPlay.png");
-    setUpButton(btn_settings, "btnSettings.png");
-    setUpButton(btn_about, "btnAbout.png");
-    setUpButton(btn_quit, "btnQuit.png");
-    setUpButton(btn_new_game, "btnNewGame.png");
+    setUpButton(btn_play, "media/btnPlay.png");
+    setUpButton(btn_settings, "media/btnSettings.png");
+    setUpButton(btn_about, "media/btnAbout.png");
+    setUpButton(btn_quit, "media/btnQuit.png");
+    setUpButton(btn_new_game, "media/btnNewGame.png");
 
     /*Make buttons proxy to built them into scene*/
     QGraphicsProxyWidget *proxy_play = pmenu_scene->addWidget    (btn_play);

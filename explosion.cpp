@@ -7,7 +7,7 @@ Explosion::Explosion(QObject *parent)
     : QObject(parent)
 {
     currentFrame = 0;
-    spriteImage = new QPixmap("sprite_sheet.png");
+    spriteImage = new QPixmap("media/sprite_sheet.png");
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(nextFrame()));

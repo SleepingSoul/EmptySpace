@@ -5,7 +5,7 @@
 SettingsScene::SettingsScene(const int w, const int h, QObject *parent)
     : QGraphicsScene(parent), wwidth(w), wheight(h)
 {
-    bg = new QPixmap  ("bg_settings.jpg");
+    bg = new QPixmap  ("media/bg_settings.jpg");
 }
 
 SettingsScene::~SettingsScene()

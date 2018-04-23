@@ -25,7 +25,7 @@ GameScene::GameScene(const int w, const int h, const QPixmap *bg, QObject *paren
     if (!bg)
         assert(false);
 
-    readDecorations(QString("decor.txt"));
+    readDecorations(QString("media/decor.txt"));
 
     foreach(Decoration *dec, dec_list) {
         this->addItem(dec);

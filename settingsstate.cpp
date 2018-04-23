@@ -47,7 +47,7 @@ SettingsState::SettingsState(GameWindow *gwd, const int ww, const int wh)
 
     /*deal with buttons */
     btn_to_menu = new QPushButton;
-    setUpButton(btn_to_menu, "btnBackMenu.png");
+    setUpButton(btn_to_menu, "media/btnBackMenu.png");
     connect(btn_to_menu, SIGNAL(clicked(bool)), SLOT(slotBtnToMenuClicked()));
 
 

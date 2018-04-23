@@ -111,7 +111,7 @@ HEADERS  += \
     mediacache.h \
     warpeffect.h
 
-FORMS    += widget.ui
+FORMS    +=
 
 RESOURCES +=
 

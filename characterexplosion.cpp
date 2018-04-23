@@ -6,10 +6,10 @@
 CharacterExplosion::CharacterExplosion(QObject *parent)
 {
     currentFrame = 0;
-    spriteImage = new QPixmap("big_sprite_sheet.png");
+    spriteImage = new QPixmap("media/big_sprite_sheet.png");
 
     player = new QMediaPlayer;
-    player->setMedia((QMediaContent(QUrl::fromLocalFile("Explosion.wav"))));
+    player->setMedia((QMediaContent(QUrl::fromLocalFile("media/Explosion.wav"))));
     player->setVolume(50);
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(nextFrame()));

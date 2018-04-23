@@ -20,9 +20,9 @@ Gun::Gun(GameplayMovableItem *h, QObject *parent)
     : QObject(parent),
       hero(h)
 {
-    pic = new QPixmap("tower.png");
-    blaster_bullet_pic = new QPixmap("bullet_1.png");
-    plasma_bullet_pic = new QPixmap("bullet_2.png");
+    pic = new QPixmap("media/tower.png");
+    blaster_bullet_pic = new QPixmap("media/bullet_1.png");
+    plasma_bullet_pic = new QPixmap("media/bullet_2.png");
     timer = new QTimer(this);
     shooting_timer = new QTimer();
     connect(shooting_timer, SIGNAL(timeout()), SLOT(slotShooting()));
@@ -36,8 +36,8 @@ Gun::Gun(GameplayMovableItem *h, QObject *parent)
     fs->setPos(mapToParent(0, -80));
     timer->start(18);
 
-    blaster_sound = new QMediaContent(QUrl::fromLocalFile("shoot_sound.wav"));
-    plasma_sound = new QMediaContent(QUrl::fromLocalFile("plasma_sound.wav"));
+    blaster_sound = new QMediaContent(QUrl::fromLocalFile("media/shoot_sound.wav"));
+    plasma_sound = new QMediaContent(QUrl::fromLocalFile("media/plasma_sound.wav"));
 
     playlist->addMedia(*blaster_sound);
     playlist->setCurrentIndex(0);
